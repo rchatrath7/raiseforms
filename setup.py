@@ -3,6 +3,7 @@ from setuptools import setup
 requires = [
     'django',
     'mysqlclient',
+    'django-localflavor',
 ]
 
 setup(
