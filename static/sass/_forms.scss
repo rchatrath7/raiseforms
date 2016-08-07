@@ -1,0 +1,59 @@
+input {
+  display: block;
+  @include border-radius(5px);
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 5px;
+  padding-left: 10px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+}
+
+select {
+  display: block;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  height: 2em;
+  font-size: 1em;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  @include border-radius(5px);
+  padding-left: 5px;
+}
+
+.btn-container {
+  width: 100%;
+  @include clearfix();
+}
+
+.btn {
+  background-color: antiquewhite;
+  @include border-radius(5px);
+  color: #4ED1AA;
+  display: inline-block;
+  cursor: pointer;
+  text-align: justify;
+  padding: 9px;
+  margin-top: 8px;
+  magin-bottom: 8px;
+  border-style: none;
+}
+
+.btn.green {
+  background-color: $green;
+  color: #fff;
+}
+
+.btn.clear {
+  background-color: transparent;
+  color: inherit;
+}
+
+.btn.full {
+  display: block;
+}
+
+.btn.inline {
+  margin-top: 0;
+  margin-bottom: 0;
+}

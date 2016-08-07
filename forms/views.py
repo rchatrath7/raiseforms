@@ -15,7 +15,7 @@ def home(request):
     :return: HTML object, either a login page, or a the main page.
     """
     form = LoginForm()
-    return render(request, 'user_form.html', {'form': form})
+    return render(request, 'partials/index.html', {'form': form})
 
 
 def users(request):
@@ -49,7 +49,7 @@ def nda(request):
             cd = form.cleaned_data
     else:
         form = NDAForm()
-    return render(request, 'user_form.html', {'form': form})
+    return render(request, 'partials/user_form.html', {'form': form})
 
 
 def statement_of_work(request):
@@ -59,7 +59,7 @@ def statement_of_work(request):
             cd = form.cleaned_data
     else:
         form = StatementOfWorkForm()
-    return render(request, 'user_form.html', {'form': form})
+    return render(request, 'partials/user_form.html', {'form': form})
 
 
 def purchase_request(request):
@@ -69,7 +69,7 @@ def purchase_request(request):
             cd = form.cleaned_data
     else:
         form = PurchaseRequestForm()
-    return render(request, 'user_form.html', {'form': form})
+    return render(request, 'partials/user_form.html', {'form': form})
 
 
 def manage(request):

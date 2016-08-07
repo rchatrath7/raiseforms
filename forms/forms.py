@@ -69,4 +69,3 @@ class PurchaseRequestForm(forms.Form):
     payment_terms_receipt = forms.ChoiceField(widget=widgets.CheckboxInput)
     additional_notes = forms.CharField(widget=widgets.Textarea)
 
-
