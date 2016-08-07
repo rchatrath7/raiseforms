@@ -15,7 +15,7 @@ def home(request):
     :return: HTML object, either a login page, or a the main page.
     """
     form = LoginForm()
-    return render(request, 'partials/index.html', {'form': form})
+    return render(request, 'partials/home.html', {'form': form})
 
 
 def users(request):
