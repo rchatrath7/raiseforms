@@ -1,0 +1,16 @@
+{
+  "name": "raiseforms",
+  "version": "0.0.0",
+  "authors": [
+    "Rakesh Chatrath <rchatrath7@gmail.com>"
+  ],
+  "ignore": [
+    "**/.**",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "bootstrap-sass": "~3.3.4",
+    "pure": "~0.6.0"
+  }
+}

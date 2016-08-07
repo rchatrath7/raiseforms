@@ -247,10 +247,11 @@ td .loading-spinner.inline {
 }
 
 .centered-container {
-  position: absolute;
   top: 0;
   left: 0;
   height: 100%;
+  width: auto;
+  margin: auto;
   display: table;
 }
 
@@ -261,7 +262,6 @@ td .loading-spinner.inline {
 }
 
 .floating-login-box {
-  max-width: 500px;
   border: 3px solid $green;
   @include border-radius(12px);
   margin: auto;
