@@ -3,6 +3,7 @@
 // Put colors here
 $green: #4ED1AA;
 $purple: #B12E55;
+$grey: #B4B4B4;
 
 $navbar-height: 65px;
 $navbar-padding: 15px;
@@ -275,6 +276,46 @@ td .loading-spinner.inline {
   }
 }
 
+.floating-control-panel {
+  max-width: 800px;
+  margin: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 5px;
+  form {
+    text-align: left;
+  }
+}
+
+.search { position: relative; }
+.search input[type="text"] {
+  height: 50px;
+  text-indent: 35px;
+}
+
+.search input[type="submit"] {
+  height: 50px;
+  background-color: $green;
+  color: whitesmoke;
+  width: 40px;
+  margin-right: -30px;
+  margin-top: -54px;
+  border-radius: 0;
+}
+
+.search .fa-search {
+  color: whitesmoke;
+  position: absolute;
+  top: 14px;
+  left: 11px;
+  font-size: 20px;
+}
+
+.search .fa-search:hover {
+  color: #555;
+  cursor: pointer;
+}
+
 .navigation-bar {
   position: fixed;
   top: 0;
@@ -312,4 +353,9 @@ td .loading-spinner.inline {
     background-color: $green;
     color: whitesmoke;
   }
+}
+
+.edit-button {
+  cursor: pointer;
+  color: #333;
 }

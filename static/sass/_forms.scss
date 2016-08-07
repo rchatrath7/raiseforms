@@ -21,13 +21,21 @@ select {
   padding-left: 5px;
 }
 
+button {
+  display: block;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding: 5px;
+  padding-left: 10px;
+}
+
 .btn-container {
   width: 100%;
   @include clearfix();
 }
 
 .btn {
-  background-color: antiquewhite;
+  background-color: whitesmoke;
   @include border-radius(5px);
   color: #4ED1AA;
   display: inline-block;
@@ -56,4 +64,12 @@ select {
 .btn.inline {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+.btn.sharp {
+  @include border-radius(0px);
+  font-weight: 500;
+  text-transform: capitalize;
+  letter-spacing: 1px;
+  text-align: center;
 }
