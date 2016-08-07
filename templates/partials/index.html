@@ -7,34 +7,15 @@
             <link href="{% static 'bower_components/pure/grids-responsive-min.css' %}" rel="stylesheet" type="text/css"/>
             <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
     </head>
-    <div class="centered-container">
-        <div class="centered">
-            <div class="floating-login-box">
-                <h1> <strong>Welcome To Raise Forms! </strong></h1>
-                <p>Please log In.</p>
-                <form class="pure-form pure-form-stacked">
-                    <fieldset>
-                        <div class="pure-g">
-                            {% if form.errors %}
-                            <div class="pure-u-1 error-text">{{ form.errors|pluralize }}</div>
-                            {%  endif %}
-                            <div class="pure-u-1">
-    {#                            <label for="username">Username</label>#}
-                                <input id="username" placeholder="Username" class="pure-u-1" />
-                            </div>
-                            <div class="pure-u-1">
-    {#                            <label for="password">Password</label>#}
-                                <input id="password" placeholder="Password" type="password" class="pure-u-1" />
-                            </div>
-                            <div class="pure-u-1">
-                                 <small><a href="">Forgot your password?</a></small>
-                            </div>
-                            <input type="submit" class="btn green pure-u-1" value="Log in" />
-    {#                        <div class="loading-spinner small"></div>#}
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
+    <body>
+        <div class="navigation-bar">
+            <ul>
+                <li><a class="active" href="">Home</a></li>
+                <li style="float:right"><a href="">Login</a></li>
+                <li style="float:right"><a href="">Password</a></li>
+                <li style="float:right"><a href="">Username</a></li>
+            </ul>
         </div>
-    </div>
+        {% block content %}{% endblock content %}
+    </body>
 </html>

@@ -272,3 +272,42 @@ td .loading-spinner.inline {
     text-align: left;
   }
 }
+
+.navigation-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: whitesmoke;
+  border-bottom: $navbar-border;
+  font-weight: bold;
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  li {
+    float: left;
+  }
+
+  li a {
+    display: block;
+    color: $green;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+
+  li a:hover:not(.active) {
+    background-color: lighten($green, 25);
+    color: lighten(whitesmoke, 15);
+  }
+
+  .active {
+    background-color: $green;
+    color: whitesmoke;
+  }
+}
