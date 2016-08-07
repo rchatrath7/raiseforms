@@ -16,15 +16,17 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 import forms.views as views
+from django.conf import settings
+from django.conf.urls.static import static
 # url(r'', home),
 #     url(r'users/', users),
 #     url(r'forms/', forms),
 #     url(r'manage/', manage),
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'$', views.home),
+    url(r'^$', views.home),
     url(r'^users/$', views.users),
     url(r'^forms/nda/$', views.nda),
     url(r'^forms/statement_of_work/$', views.statement_of_work),
     url(r'^forms/request_purchase/$', views.purchase_request)
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
