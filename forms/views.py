@@ -53,13 +53,15 @@ def nda(request):
         if form.is_valid():
             print >> sys.stderr, "Form is valid"
             cd = form.cleaned_data
-            # custom_fields = [
-            #     {"full_name": "Raise Dev"},
-            #     {"corporation": cd['corporation']},
-            #     {"location": cd['location']},
-            #     {"title": cd['title']},
-            # ]
-            embed_url = generic_template_handler(request, "NDA")
+            custom_fields = [
+                {"full_name": "Raise Dev"},
+                {"corporation": cd['corporation']},
+                {"location": cd['location']},
+                {"title": cd['title']},
+                {"exec_title": "Dictator"},
+                {"exec_name": "Raise Dev"}
+            ]
+            embed_url = generic_template_handler(request, "NDA", custom_fields)
             return render(request, 'partials/nda_document.html', {'embed_url': embed_url})
         else:
             print >> sys.stderr, "Form is not valid <{0}>".format(form.errors)
@@ -94,7 +96,7 @@ def manage(request):
     pass
 
 
-def generic_template_handler(request, template_id):
+def generic_template_handler(request, template_id, custom_fields):
     '''
     Take in a request, template type (NDA, Consulting Agreement, Fields, etc.) and get the hellosign template. This will
     be passed to our form processor for more logic to be done. This should be able to handle any type of form and return
@@ -117,7 +119,8 @@ def generic_template_handler(request, template_id):
                                     subject="Please sign this {0} form".format(template_id),
                                     message="Please sign and verify all fields on this {0} form.".format(template_id),
                                     signing_redirect_url=None,
-                                    signers=signers
+                                    signers=signers,
+                                    custom_fields=custom_fields
     )
     for signature in signature_request.signatures:
         embedded_obj = client.get_embedded_object(signature.signature_id)
