@@ -5,6 +5,7 @@ requires = [
     'mysqlclient',
     'django-localflavor',
     'hellosign-python-sdk',
+    'gunicorn',
 ]
 
 setup(
