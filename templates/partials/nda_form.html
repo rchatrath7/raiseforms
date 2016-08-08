@@ -1,0 +1,43 @@
+{% extends 'partials/index.html' %}
+{% block content %}
+    {% if nda_form %}
+        {% if nda_form.errors %}
+            <P>Please correct the errors below {{ nda_form.errors|pluralize }}</P>
+        {% endif %}
+        <div class="centered-container">
+            <div class="centered">
+                <div class="floating-login-box">
+                    <h1>Please fill out this NDA form.</h1>
+                    <form class="pure-g" action="" method="post">
+                        <div class="pure-u-1">
+                            <label for="ssn">SSN</label>
+                            {{ nda_form.ssn }}
+                        </div>
+                        <div class="pure-u-1">
+                            <label for="corporation">Corporation</label>
+                            {{ nda_form.corporation }}
+                        </div>
+                        <div class="pure-u-1">
+                            <label for="location">Primary Location</label>
+                            {{ nda_form.location }}
+                        </div>
+                        <div class="pure-u-1">
+                            <label for="title">Title</label>
+                            {{ nda_form.title }}
+                        </div>
+                        <div class="pure-u-1">
+                            <label for="date">Today's Date</label>
+                            {{ nda_form.date }}
+                        </div>
+                        {% csrf_token %}
+                        <div class="pure-u-1">
+                            <input type="submit" class="btn green pure-u-1" style="text-align:center" value="Submit"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% elif embed_url%}
+            <iframe src={{ embed_url }}></iframe>
+    {% endif %}
+{% endblock %}

@@ -4,6 +4,7 @@ requires = [
     'django',
     'mysqlclient',
     'django-localflavor',
+    'hellosign-python-sdk',
 ]
 
 setup(

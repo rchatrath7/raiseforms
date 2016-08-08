@@ -1,11 +1,16 @@
 from django.shortcuts import render
+from django.conf import settings
+import logging
+import sys
 from models import Executive, Client, NDA, StatementOfWork, ConsultingAgreement, PurchaseRequest
 from forms import *
+from hellosign_sdk import HSClient as HS
 
 # Create your views here.
 # TODO: Compartmentalize the forms view to handle one thing at a time.
 # TODO: Add an "all-purpose" form view
 
+logger = logging.getLogger(__name__)
 
 def home(request):
     """
@@ -18,7 +23,7 @@ def home(request):
     return render(request, 'partials/home.html', {'form': form})
 
 
-def users(request):
+def client_panel(request):
     """
     This handles the commands for interfacing with a specific user. If we don't have the basic information of the user,
     then the only option available should be to send a user the form to gather essential information. However, if the
@@ -45,11 +50,24 @@ def forms(request):
 def nda(request):
     if request.method == 'POST':
         form = NDAForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
+            print >> sys.stderr, "Form is valid"
             cd = form.cleaned_data
+            # custom_fields = [
+            #     {"full_name": "Raise Dev"},
+            #     {"corporation": cd['corporation']},
+            #     {"location": cd['location']},
+            #     {"title": cd['title']},
+            # ]
+            embed_url = generic_template_handler(request, "NDA")
+            return render(request, 'partials/nda_document.html', {'embed_url': embed_url})
+        else:
+            print >> sys.stderr, "Form is not valid <{0}>".format(form.errors)
+            return render(request, 'partials/nda_document.html')
     else:
+        print >> sys.stderr, "Rendering input form"
         form = NDAForm()
-    return render(request, 'partials/user_form.html', {'form': form})
+    return render(request, 'partials/nda_form.html', {'nda_form': form})
 
 
 def statement_of_work(request):
@@ -74,3 +92,36 @@ def purchase_request(request):
 
 def manage(request):
     pass
+
+
+def generic_template_handler(request, template_id):
+    '''
+    Take in a request, template type (NDA, Consulting Agreement, Fields, etc.) and get the hellosign template. This will
+    be passed to our form processor for more logic to be done. This should be able to handle any type of form and return
+    any form embeddable.
+    :param request:
+    :param template_id: The template type to be referenced (NDA, Consulting Agreement, Purchase Request, etc.)
+    :param custom_fields: These are special fields unique to the template.
+    :return: embeddable URL for an iFrame.
+    '''
+    client = HS(api_key=settings.HELLOSIGN_API_KEY)
+    signers = [
+        {'role_name': 'Executive', 'name': "Raise Dev", 'email_address': "raisedev1@gmail.com"},
+        {'role_name': 'Client', 'name': "Rakesh", "email_address": 'rchatrath7@gmail.com'}
+    ]
+    signature_request = client.send_signature_request_embedded_with_template(
+                                    test_mode=True,
+                                    client_id=settings.CLIENT_ID,
+                                    template_id=settings.TEMPLATE_IDS.get(template_id),
+                                    title="{0} form with Raise Inc.".format(template_id),
+                                    subject="Please sign this {0} form".format(template_id),
+                                    message="Please sign and verify all fields on this {0} form.".format(template_id),
+                                    signing_redirect_url=None,
+                                    signers=signers
+    )
+    for signature in signature_request.signatures:
+        embedded_obj = client.get_embedded_object(signature.signature_id)
+        sign_url = embedded_obj.sign_url
+        return sign_url
+
+    return ""

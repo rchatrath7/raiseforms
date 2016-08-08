@@ -1,0 +1,6 @@
+{% extends 'partials/index.html' %}
+{% block content %}
+    {% if embed_url %}
+        <iframe src={{ embed_url }}></iframe>
+    {% endif %}
+{% endblock %}

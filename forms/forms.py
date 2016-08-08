@@ -17,6 +17,7 @@ class ClientForm(forms.Form):
 
 class NDAForm(forms.Form):
     ssn = lf_forms.USSocialSecurityNumberField()
+    corporation = forms.CharField(max_length=100)
     location = forms.CharField(max_length=100)
     title = forms.CharField(max_length=100)
     date = forms.DateTimeField(widget=widgets.SelectDateWidget)
