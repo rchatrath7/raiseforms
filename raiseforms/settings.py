@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'raiseforms.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 
-# DATABASE_URL = "mysql://bd647441445c99:384c543f@us-cdbr-iron-east-04.cleardb.net/heroku_c55f0079fb2fadf"
+DATABASE_URL = "mysql://bd647441445c99:384c543f@us-cdbr-iron-east-04.cleardb.net/heroku_c55f0079fb2fadf"
 
 
 DATABASES = {
@@ -94,8 +94,7 @@ DATABASES = {
 }
 
 
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+DATABASES['default'] = dj_database_url.config(default=DATABASE_URL, conn_max_age=500)
 
 
 # Password validation
