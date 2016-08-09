@@ -17,6 +17,7 @@ class ClientForm(forms.Form):
 
 class NDAForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
+    email = forms.EmailField(widget=widgets.EmailInput(attrs={'class': 'pure-u-1'}))
     ssn = lf_forms.USSocialSecurityNumberField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
     corporation = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
     location = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))

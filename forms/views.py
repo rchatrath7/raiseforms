@@ -15,7 +15,6 @@ def login_handler(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        print >> sys.stderr, "<Username: %s, Password: %s>" % (username, password)
         user = authenticate(username=username, password=password)
         print >> sys.stderr, user.is_active
         if user is not None:
@@ -76,6 +75,7 @@ def nda(request):
         if form.is_valid():
             cd = form.cleaned_data
             custom_fields = [
+                {'email': cd['email']},
                 {"full_name": cd['name']},
                 {"corporation": cd['corporation']},
                 {"location": cd['location']},
@@ -134,7 +134,7 @@ def generic_template_handler(request, template_id, custom_fields):
     client = HS(api_key=settings.HELLOSIGN_API_KEY)
     signers = [
         {'role_name': 'Executive', 'name': request.user.get_full_name(), 'email_address': request.user.email},
-        {'role_name': 'Client', 'name': "Raise Dev", "email_address": 'raisedev1@gmail.com'}
+        {'role_name': 'Client', 'name': custom_fields[1]['full_name'], "email_address": custom_fields[0]['email']}
     ]
     signature_request = client.send_signature_request_with_template(
                                     test_mode=True,
@@ -145,8 +145,9 @@ def generic_template_handler(request, template_id, custom_fields):
                                     message="Please sign and verify all fields on this {0} form.".format(template_id),
                                     signing_redirect_url=None,
                                     signers=signers,
-                                    custom_fields=custom_fields
+                                    custom_fields=custom_fields[1:]
     )
+    # DO something with this signature request - return response?
     # for signature in signature_request.signatures:
     #     embedded_obj = client.get_embedded_object(signature.signature_id)
     #     sign_url = embedded_obj.sign_url
