@@ -30,4 +30,7 @@ urlpatterns = [
     url(r'^forms/nda/$', views.nda),
     url(r'^forms/statement_of_work/$', views.statement_of_work),
     url(r'^forms/request_purchase/$', views.purchase_request)
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

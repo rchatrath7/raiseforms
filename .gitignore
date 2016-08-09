@@ -4,6 +4,6 @@
 *.css
 static/bower_components/
 raiseforms.egg-info/*
-static_root/
+staticfiles/
 build/*
 dist/*
