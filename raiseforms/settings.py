@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -77,6 +78,9 @@ WSGI_APPLICATION = 'raiseforms.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
+DATABASE_URL = "mysql://bd647441445c99:384c543f@us-cdbr-iron-east-04.cleardb.net/heroku_c55f0079fb2fadf"
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -87,6 +91,10 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+
+db_from_env = dj_database_url.config(conn_max_age=500, default=DATABASE_URL)
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation

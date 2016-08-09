@@ -7,6 +7,7 @@ requires = [
     'hellosign-python-sdk',
     'gunicorn',
     'whitenoise',
+    'dj-database-url',
 ]
 
 setup(
