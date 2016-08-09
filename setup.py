@@ -6,6 +6,7 @@ requires = [
     'django-localflavor',
     'hellosign-python-sdk',
     'gunicorn',
+    'whitenoise',
 ]
 
 setup(
