@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.conf import settings
-import logging
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 import sys
-from models import Executive, Client, NDA, StatementOfWork, ConsultingAgreement, PurchaseRequest
 from forms import *
 from hellosign_sdk import HSClient as HS
 
@@ -10,8 +10,29 @@ from hellosign_sdk import HSClient as HS
 # TODO: Compartmentalize the forms view to handle one thing at a time.
 # TODO: Add an "all-purpose" form view
 
-logger = logging.getLogger(__name__)
 
+def login_handler(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        print >> sys.stderr, "<Username: %s, Password: %s>" % (username, password)
+        user = authenticate(username=username, password=password)
+        print >> sys.stderr, user.is_active
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return redirect('/')
+            else:
+                pass
+                # Raise inactive user error
+        else:
+            pass
+            # Raise invalid login message.
+    else:
+        return render(request, 'partials/login.html')
+
+
+@login_required(login_url='/login/')
 def home(request):
     """
     This handles the homepage view-it should return a log in page if the user hasn't authenticate, or, the main page
@@ -19,10 +40,10 @@ def home(request):
     :param request:
     :return: HTML object, either a login page, or a the main page.
     """
-    form = LoginForm()
-    return render(request, 'partials/home.html', {'form': form})
+    return render(request, 'partials/home.html')
 
 
+@login_required(login_url='/login/')
 def client_panel(request):
     """
     This handles the commands for interfacing with a specific user. If we don't have the basic information of the user,
@@ -35,6 +56,7 @@ def client_panel(request):
     pass
 
 
+@login_required(login_url='/login/')
 def forms(request):
     """
     We need to do a few things with this forms view. We need a generic view to handle creation of any given form,
@@ -47,31 +69,32 @@ def forms(request):
     pass
 
 
+@login_required(login_url='/login/')
 def nda(request):
     if request.method == 'POST':
         form = NDAForm(request.POST)
         if form.is_valid():
-            print >> sys.stderr, "Form is valid"
             cd = form.cleaned_data
             custom_fields = [
-                {"full_name": "Raise Dev"},
+                {"full_name": cd['name']},
                 {"corporation": cd['corporation']},
                 {"location": cd['location']},
                 {"title": cd['title']},
-                {"exec_title": "Dictator"},
-                {"exec_name": "Raise Dev"}
+                {"exec_title": request.user.executive.title},
+                {"exec_name": request.user.get_full_name()}
             ]
-            embed_url = generic_template_handler(request, "NDA", custom_fields)
-            return render(request, 'partials/nda_document.html', {'embed_url': embed_url})
+            generic_template_handler(request, "NDA", custom_fields)
+            return render(request, 'partials/nda_form.html', {'embed_url': ""})
         else:
             print >> sys.stderr, "Form is not valid <{0}>".format(form.errors)
-            return render(request, 'partials/nda_document.html')
+            return render(request, 'partials/nda_form.html')
     else:
         print >> sys.stderr, "Rendering input form"
         form = NDAForm()
     return render(request, 'partials/nda_form.html', {'nda_form': form})
 
 
+@login_required(login_url='/login/')
 def statement_of_work(request):
     if request.method == 'POST':
         form = StatementOfWorkForm(request.POST)
@@ -82,6 +105,7 @@ def statement_of_work(request):
     return render(request, 'partials/user_form.html', {'form': form})
 
 
+@login_required(login_url='/login/')
 def purchase_request(request):
     if request.method == 'POST':
         form = PurchaseRequestForm(request.POST)
@@ -92,6 +116,7 @@ def purchase_request(request):
     return render(request, 'partials/user_form.html', {'form': form})
 
 
+@login_required(login_url='/login/')
 def manage(request):
     pass
 
@@ -108,12 +133,12 @@ def generic_template_handler(request, template_id, custom_fields):
     '''
     client = HS(api_key=settings.HELLOSIGN_API_KEY)
     signers = [
-        {'role_name': 'Executive', 'name': "Raise Dev", 'email_address': "raisedev1@gmail.com"},
-        {'role_name': 'Client', 'name': "Rakesh", "email_address": 'rchatrath7@gmail.com'}
+        {'role_name': 'Executive', 'name': request.user.get_full_name(), 'email_address': request.user.email},
+        {'role_name': 'Client', 'name': "Raise Dev", "email_address": 'raisedev1@gmail.com'}
     ]
-    signature_request = client.send_signature_request_embedded_with_template(
+    signature_request = client.send_signature_request_with_template(
                                     test_mode=True,
-                                    client_id=settings.CLIENT_ID,
+                                    # client_id=settings.CLIENT_ID,
                                     template_id=settings.TEMPLATE_IDS.get(template_id),
                                     title="{0} form with Raise Inc.".format(template_id),
                                     subject="Please sign this {0} form".format(template_id),
@@ -122,9 +147,9 @@ def generic_template_handler(request, template_id, custom_fields):
                                     signers=signers,
                                     custom_fields=custom_fields
     )
-    for signature in signature_request.signatures:
-        embedded_obj = client.get_embedded_object(signature.signature_id)
-        sign_url = embedded_obj.sign_url
-        return sign_url
+    # for signature in signature_request.signatures:
+    #     embedded_obj = client.get_embedded_object(signature.signature_id)
+    #     sign_url = embedded_obj.sign_url
+    #     return sign_url
 
-    return ""
+    # return ""

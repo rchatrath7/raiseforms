@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 # Create your models here.
 
 
@@ -14,23 +16,19 @@ class Executive(models.Model):
     # Raise executive. We need to get the name and email of the Raise executive for use when signing the docusign
     # document.
     # TODO: Adding more fields and any necessary methods. Make a more secure way of hasing and storing passwords.
-    name = models.CharField(max_length=50)
-    email = models.EmailField(max_length=30)
-    username = models.CharField(max_length=30)
+    # TODO: Inherit from user
     title = models.CharField(max_length=30)
+    user = models.OneToOneField(User)
     # We need to use a better way of storing the password - Use hashing algorithm and some sort of setter
-    # password = models.CharField(max_length=16)
-
-    def __str__(self):
-        return "<Name: %s, Email: %s>" % (self.name, self.email)
 
 
 class Client(models.Model):
     # The client is the person signing. We want to be able to send them multiple forms if possible, as well as gather
     # All necessary information at once.
     # TODO: Figure out file uploading/googledocs support.
-    name = models.CharField(max_length=50)
-    email = models.EmailField(max_length=30)
+    # TODO: Inherit from user
+    # Perhaps move relations to Client class instead of individual objects. - Mapping might make more sense that way.
+    user = models.OneToOneField(User)
     address = models.CharField(max_length=100)
     nda_file = models.FileField(upload_to=file_upload_path)
     statement_of_work = models.FileField(upload_to=file_upload_path)
@@ -140,3 +138,18 @@ class PurchaseRequest(models.Model):
     def __str__(self):
         return "<Purchase Request: %s, Date: %s, Cost Center: %s, Requester: %s, Owner: %s, Payment Type: %s>"\
             % (self.id, self.date, self.cost_center, self.requester, self.owner, self.payment_type)
+
+
+def create_executive_user(sender, instance, created, **kwargs):
+    if created:
+        Executive.objects.create(user=instance)
+
+
+def create_client_user(sender, instance, created, **kwargs):
+    if created:
+        Client.objects.create(user=instance)
+
+
+post_save.connect(create_executive_user, sender=User)
+#post_save.connect(create_client_user, sender=User)
+

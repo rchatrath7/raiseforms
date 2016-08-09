@@ -5,7 +5,7 @@
             <div class="floating-login-box">
                 <h1><strong>Welcome to Raise Forms!</strong></h1>
                 <p>Please log in.</p>
-                <form class="pure-form pure-form-stacked">
+                <form class="pure-form pure-form-stacked" action="" method="post">
                     <fieldset>
                         <div class="pure-g">
 {#                            <div class="pure-u-1 error-text">#}
@@ -15,12 +15,13 @@
 {#                            </div>#}
                             <div class="pure-u-1">
                                 <label for="username">Username</label>
-                                <input id="username" class="pure-u-1" placeholder="Username" />
+                                <input id="username" class="pure-u-1" name="username" placeholder="Username" />
                             </div>
                             <div class="pure-u-1">
                                 <label for="password">Password</label>
-                                <input id="password" class="pure-u-1" type="password" placeholder="Password" />
+                                <input id="password" class="pure-u-1" type="password" name="password" placeholder="Password" />
                             </div>
+                            {% csrf_token %}
                             <div class="pure-u-1">
                                 <input type="submit" class="btn green pure-u-1" style="text-align:center" value="Login"/>
                             </div>
