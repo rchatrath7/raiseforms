@@ -1,9 +1,6 @@
 *.pyc
 .idea/
 .sass-cache/
-*.css
-static/bower_components/
 raiseforms.egg-info/*
-staticfiles/
 build/*
 dist/*
