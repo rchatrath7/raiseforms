@@ -13,9 +13,9 @@ from hellosign_sdk import HSClient as HS
 
 def login_handler(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=str(username), password=str(password))
+        username = str(request.POST['username'])
+        password = str(request.POST['password'])
+        user = authenticate(username=username, password=password)
         if user is not None:
             if user.is_active:
                 login(request, user)
