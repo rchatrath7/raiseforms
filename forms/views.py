@@ -15,8 +15,7 @@ def login_handler(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        print >> sys.stderr, user.is_active
+        user = authenticate(username=str(username), password=str(password))
         if user is not None:
             if user.is_active:
                 login(request, user)
