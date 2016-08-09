@@ -3,7 +3,7 @@
 .sass-cache/
 *.css
 static/bower_components/
-raiseforms.egg-info/
+raiseforms.egg-info/*
 static_root/
-build/
-dist/
+build/*
+dist/*
