@@ -30,6 +30,11 @@ def login_handler(request):
         return render(request, 'partials/login.html')
 
 
+def logout_handler(request):
+    logout(request)
+    return redirect('/')
+
+
 @login_required(login_url='/login/')
 def home(request):
     """

@@ -75,6 +75,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'raiseforms.wsgi.application'
 
 
+# Authentication
+AUTH_USER_MODEL = 'forms.AbstractUserModel'
+
+
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 

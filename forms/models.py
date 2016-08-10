@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.signals import post_save
 # Create your models here.
 
@@ -11,35 +11,74 @@ def file_upload_path(instance, filename):
     # We could also remove all file handling to the individual classes
     return str(self.id) + '/' + filename
 
+# Abstract User and Manager models taken from https://thinkster.io/django-angularjs-tutorial
+
+
+class AbstractUserModel(AbstractBaseUser):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=40, unique=True)
+
+    first_name = models.CharField(max_length=40, blank=True)
+    last_name = models.CharField(max_length=40, blank=True)
+    tagline = models.CharField(max_length=140, blank=True)
+
+    is_admin = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    account_types = (
+        ('C', 'Client'),
+        ('E', "Executive")
+    )
+
+    account_type = models.CharField(max_length=1, choices=account_types, default='E')
+
+    objects = AbstractUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    def __unicode__(self):
+        return self.email
+
+    def get_full_name(self):
+        return ' '.join([self.first_name, self.last_name])
+
+    def get_short_name(self):
+        return self.first_name
+
+
+class AbstractUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **kwargs):
+        if not email:
+            raise ValueError('Users must have a valid email address.')
+
+        if not kwargs.get('username'):
+            raise ValueError('Users must have a valid username.')
+
+        user = self.model(
+            email=self.normalize_email(email), username=kwargs.get('username')
+        )
+
+        user.set_password(password)
+        user.save()
+
+        return user
+
+    def create_superuser(self, email, password, **kwargs):
+        user = self.create_user(email, password, **kwargs)
+
+        user.is_admin = True
+        user.save()
+
+        return user
+
 
 class Executive(models.Model):
-    # Raise executive. We need to get the name and email of the Raise executive for use when signing the docusign
-    # document.
-    # TODO: Adding more fields and any necessary methods. Make a more secure way of hasing and storing passwords.
-    # TODO: Inherit from user
+    # Raise Executive
     title = models.CharField(max_length=30)
-    user = models.OneToOneField(User)
-    # We need to use a better way of storing the password - Use hashing algorithm and some sort of setter
-
-
-class Client(models.Model):
-    # The client is the person signing. We want to be able to send them multiple forms if possible, as well as gather
-    # All necessary information at once.
-    # TODO: Figure out file uploading/googledocs support.
-    # TODO: Inherit from user
-    # Perhaps move relations to Client class instead of individual objects. - Mapping might make more sense that way.
-    user = models.OneToOneField(User)
-    address = models.CharField(max_length=100)
-    nda_file = models.FileField(upload_to=file_upload_path)
-    statement_of_work = models.FileField(upload_to=file_upload_path)
-    consulting_agreement = models.FileField(upload_to=file_upload_path)
-    purchase_request = models.FileField(upload_to=file_upload_path)
-
-    # Relations
-    executive = models.ForeignKey(Executive)
-
-    def __str__(self):
-        return "<Name: %s, Email: %s>" % (self.name, self.email)
+    user = models.OneToOneField(AbstractUserModel)
 
 
 class NDA(models.Model):
@@ -52,7 +91,6 @@ class NDA(models.Model):
     agreement_date = models.DateTimeField(auto_now_add=True)
 
     # Relations
-    client = models.ForeignKey(Client)
     executive = models.ForeignKey(Executive)
 
     def __str__(self):
@@ -81,7 +119,6 @@ class StatementOfWork(models.Model):
     additional_terms_of_services = models.TextField()
 
     # Relations
-    client = models.ForeignKey(Client)
     executive = models.ForeignKey(Executive)
 
     def __str__(self):
@@ -92,7 +129,6 @@ class ConsultingAgreement(models.Model):
     agreement_date = models.DateTimeField(auto_now_add=True)
 
     # Relations
-    client = models.ForeignKey(Client)
     executive = models.ForeignKey(Executive)
 
     def __str__(self):
@@ -140,16 +176,44 @@ class PurchaseRequest(models.Model):
             % (self.id, self.date, self.cost_center, self.requester, self.owner, self.payment_type)
 
 
-def create_executive_user(sender, instance, created, **kwargs):
+class Client(models.Model):
+    # The client is the person signing. We want to be able to send them multiple forms if possible, as well as gather
+    # All necessary information at once.
+    # TODO: Figure out file uploading/googledocs support.
+    # TODO: Inherit from user
+    # Perhaps move relations to Client class instead of individual objects. - Mapping might make more sense that way.
+    user = models.OneToOneField(User)
+    address = models.CharField(max_length=100)
+    nda_file = models.FileField(upload_to=file_upload_path)
+    statement_of_work_file = models.FileField(upload_to=file_upload_path)
+    consulting_agreement_file = models.FileField(upload_to=file_upload_path)
+    purchase_request_file = models.FileField(upload_to=file_upload_path)
+
+    # Relations
+    executive = models.ForeignKey(Executive)
+    nda = models.ForeignKey(NDA)
+    statement_of_work = models.ForeignKey(StatementOfWork)
+    consulting_agreement = models.ForeignKey(ConsultingAgreement)
+    # Purchase Request ForeignKey
+
+
+# Abstract user creation accounts into one function
+# def create_executive_user(sender, instance, created, **kwargs):
+#     if created:
+#         Executive.objects.create(user=instance)
+#
+#
+# def create_client_user(sender, instance, created, **kwargs):
+#     if created:
+#         Client.objects.create(user=instance)
+def abstract_user_creation(sender, instance, created, **kwargs):
     if created:
-        Executive.objects.create(user=instance)
+        if kwargs.get('account_type') == 'C':
+            Client.objects.create(user=instance)
+        else:
+            Executive.objects.create(user=instance)
 
-
-def create_client_user(sender, instance, created, **kwargs):
-    if created:
-        Client.objects.create(user=instance)
-
-
-post_save.connect(create_executive_user, sender=User)
-#post_save.connect(create_client_user, sender=User)
+post_save.connect(abstract_user_creation, sender=AbstractUserModel)
+# post_save.connect(create_executive_user, sender=User)
+# #post_save.connect(create_client_user, sender=User)
 
