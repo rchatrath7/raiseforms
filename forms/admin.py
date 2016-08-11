@@ -1,6 +1,5 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin, User
-from models import Executive, Client, NDA, StatementOfWork, ConsultingAgreement, PurchaseRequest
+from models import AbstractUserModel, Executive, Client, NDA, StatementOfWork, ConsultingAgreement, PurchaseRequest
 
 
 # Defining InlineClasses
@@ -15,15 +14,14 @@ class ClientInline(admin.StackedInline):
 
 
 # Define new UserAdmin
-class UserAdmin(UserAdmin):
+class UserAdmin(admin.ModelAdmin):
     inlines = (ExecutiveInline, )
 
 
 # Register your models here.
 # admin.site.register(Executive)
 # admin.site.register(Client)
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+admin.site.register(AbstractUserModel, UserAdmin)
 admin.site.register(NDA)
 admin.site.register(StatementOfWork)
 admin.site.register(ConsultingAgreement)

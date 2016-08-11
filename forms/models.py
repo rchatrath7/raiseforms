@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db.models.signals import post_save
+import raiseforms.settings as settings
 # Create your models here.
 
 
@@ -12,41 +13,6 @@ def file_upload_path(instance, filename):
     return str(self.id) + '/' + filename
 
 # Abstract User and Manager models taken from https://thinkster.io/django-angularjs-tutorial
-
-
-class AbstractUserModel(AbstractBaseUser):
-    email = models.EmailField(unique=True)
-    username = models.CharField(max_length=40, unique=True)
-
-    first_name = models.CharField(max_length=40, blank=True)
-    last_name = models.CharField(max_length=40, blank=True)
-    tagline = models.CharField(max_length=140, blank=True)
-
-    is_admin = models.BooleanField(default=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    account_types = (
-        ('C', 'Client'),
-        ('E', "Executive")
-    )
-
-    account_type = models.CharField(max_length=1, choices=account_types, default='E')
-
-    objects = AbstractUserManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
-
-    def __unicode__(self):
-        return self.email
-
-    def get_full_name(self):
-        return ' '.join([self.first_name, self.last_name])
-
-    def get_short_name(self):
-        return self.first_name
 
 
 class AbstractUserManager(BaseUserManager):
@@ -70,15 +36,64 @@ class AbstractUserManager(BaseUserManager):
         user = self.create_user(email, password, **kwargs)
 
         user.is_admin = True
+        user.is_superuser = True
         user.save()
 
         return user
 
 
+class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=40, unique=True)
+
+    first_name = models.CharField(max_length=40, blank=True)
+    last_name = models.CharField(max_length=40, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    account_types = (
+        ('C', 'Client'),
+        ('E', "Executive")
+    )
+
+    account_type = models.CharField(max_length=1, choices=account_types, default='E')
+
+    is_admin = models.BooleanField(default=account_type == 'E', verbose_name='Admin')
+    is_admin.help_text = "All Executives are considered Admins, but Clients are not."
+    is_admin.disabled = True
+
+    objects = AbstractUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    def __unicode__(self):
+        return self.email
+
+    def get_full_name(self):
+        return ' '.join([self.first_name, self.last_name])
+
+    def get_short_name(self):
+        return self.first_name
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_staff(self):
+        return self.is_active
+
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
+
+
 class Executive(models.Model):
     # Raise Executive
     title = models.CharField(max_length=30)
-    user = models.OneToOneField(AbstractUserModel)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
 
 
 class NDA(models.Model):
@@ -97,6 +112,9 @@ class NDA(models.Model):
         return "<SSN: %s, Location: %s, Corporation: %s, Title: %s, Agreement Date: %s, Client: %s, Executive: %s>"\
             % (self.ssn, self.location, self.corporation, self.title, self.agreement_date, self.client, self.executive)
 
+    class Meta:
+        verbose_name = 'NDA'
+        verbose_name_plural = 'NDA Forms'
 
 
 class StatementOfWork(models.Model):
@@ -124,6 +142,10 @@ class StatementOfWork(models.Model):
     def __str__(self):
         return "<Statement Of Work: %s, Client: %s, Executive: %s>" % (self.id, self.client, self.executive)
 
+    class Meta:
+        verbose_name = 'Statement of Work'
+        verbose_name_plural = 'Statement of Work Forms'
+
 
 class ConsultingAgreement(models.Model):
     agreement_date = models.DateTimeField(auto_now_add=True)
@@ -135,13 +157,17 @@ class ConsultingAgreement(models.Model):
         return "<Consulting Agreement: %s, Agreement Date: %s, Client: %s, Executive: %s>"\
                % (self.id, self.agreement_date, self.client, self.executive)
 
+    class Meta:
+        verbose_name = 'Consulting Agreement'
+        verbose_name_plural = 'Consulting Agreement Forms'
+
 
 class PurchaseRequest(models.Model):
     # TODO: I'd like to add properties and in general cleaner ways of handling things
     date = models.DateTimeField(auto_now_add=True)
     cost_center = models.CharField(max_length=50)
     # Client/Owner
-    requester = models.ForeignKey(Client)
+    # requester = models.ForeignKey(Client)
     owner = models.ForeignKey(Executive)
     vendor = models.CharField(max_length=30)
     description = models.TextField()
@@ -175,14 +201,16 @@ class PurchaseRequest(models.Model):
         return "<Purchase Request: %s, Date: %s, Cost Center: %s, Requester: %s, Owner: %s, Payment Type: %s>"\
             % (self.id, self.date, self.cost_center, self.requester, self.owner, self.payment_type)
 
+    class Meta:
+        verbose_name = 'Purchase Request'
+        verbose_name_plural = 'Purchase Request Forms'
+
 
 class Client(models.Model):
     # The client is the person signing. We want to be able to send them multiple forms if possible, as well as gather
     # All necessary information at once.
     # TODO: Figure out file uploading/googledocs support.
-    # TODO: Inherit from user
-    # Perhaps move relations to Client class instead of individual objects. - Mapping might make more sense that way.
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
     address = models.CharField(max_length=100)
     nda_file = models.FileField(upload_to=file_upload_path)
     statement_of_work_file = models.FileField(upload_to=file_upload_path)
@@ -197,15 +225,6 @@ class Client(models.Model):
     # Purchase Request ForeignKey
 
 
-# Abstract user creation accounts into one function
-# def create_executive_user(sender, instance, created, **kwargs):
-#     if created:
-#         Executive.objects.create(user=instance)
-#
-#
-# def create_client_user(sender, instance, created, **kwargs):
-#     if created:
-#         Client.objects.create(user=instance)
 def abstract_user_creation(sender, instance, created, **kwargs):
     if created:
         if kwargs.get('account_type') == 'C':
@@ -214,6 +233,3 @@ def abstract_user_creation(sender, instance, created, **kwargs):
             Executive.objects.create(user=instance)
 
 post_save.connect(abstract_user_creation, sender=AbstractUserModel)
-# post_save.connect(create_executive_user, sender=User)
-# #post_save.connect(create_client_user, sender=User)
-
