@@ -4,11 +4,19 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 import sys
 from forms import *
+from models import *
 from hellosign_sdk import HSClient as HS
 
 # Create your views here.
 # TODO: Compartmentalize the forms view to handle one thing at a time.
 # TODO: Add an "all-purpose" form view
+
+
+def user_is_executive(request):
+    if request.user.account_type == 'E':
+        return True
+    else:
+        return False
 
 
 def login_handler(request):
@@ -46,6 +54,18 @@ def home(request):
     return render(request, 'partials/home.html')
 
 
+@login_required(login_url='/login')
+@user_passes_test(user_is_executive)
+def search(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        emails = Client.user.objects.values_list('email', flat=True)
+        if email in emails:
+            return render(request, 'search-results', {'emails': emails})
+        else:
+            return render(request, 'search-results', {'emails': []})
+
+
 @login_required(login_url='/login/')
 def client_panel(request):
     """
@@ -73,7 +93,7 @@ def forms(request):
 
 
 @login_required(login_url='/login/')
-def nda(request):
+def nda(request, user_id):
     if request.method == 'POST':
         form = NDAForm(request.POST)
         if form.is_valid():
@@ -87,13 +107,36 @@ def nda(request):
                 {"exec_title": request.user.executive.title},
                 {"exec_name": request.user.get_full_name()}
             ]
+            if request.user.account_type == 'E':
+                # create NDA relationship with client
+                nda = NDA(
+                    ssn=cd['ssn'],
+                    location=cd['location'],
+                    corporation=cd['corporation'],
+                    title=cd['title'],
+                    executive=request.user.executive
+                )
+                nda.save()
+                client = Client.objects.get(id=user_id)
+                client.nda = NDA.objects.get(id=nda.id)
+                client.save()
+            elif request.user.account_type == 'C':
+                # save
+                nda = NDA(
+                    ssn=cd['ssn'],
+                    location=cd['location'],
+                    corporation=cd['corporation'],
+                    title=cd['title'],
+                    executive=request.user.client.executive
+                )
+                nda.save()
+                request.user.client.nda = NDA.objects.get(id=nda.id)
+                request.user.client.save()
             generic_template_handler(request, "NDA", custom_fields)
             return render(request, 'partials/nda_form.html', {'embed_url': ""})
         else:
-            print >> sys.stderr, "Form is not valid <{0}>".format(form.errors)
             return render(request, 'partials/nda_form.html')
     else:
-        print >> sys.stderr, "Rendering input form"
         form = NDAForm()
     return render(request, 'partials/nda_form.html', {'nda_form': form})
 

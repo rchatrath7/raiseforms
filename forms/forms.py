@@ -3,14 +3,12 @@ from django.forms import widgets
 from localflavor.us import forms as lf_forms
 
 
-class LoginForm(forms.Form):
-    username = forms.CharField(max_length=20)
-    password = forms.CharField(widget=widgets.PasswordInput)
-
-
 class ClientForm(forms.Form):
     # TODO: Consolidated address into pieces validated through lfForm Fields
-    name = forms.CharField(max_length=50)
+    first_name = forms.CharField(max_length=50)
+    last_name = forms.CharField(max_length=50)
+    user_name = forms.CharField(max_length=50)
+    password = forms.CharField(widget=widgets.PasswordInput)
     email = forms.EmailField(max_length=30, widget=widgets.EmailInput)
     address = forms.CharField(max_length=100)
 
