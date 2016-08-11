@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import sys
 import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -145,24 +146,15 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, "staticfiles")
 
-# Docusign config
-# ANYSIGN = {
-#     'BACKENDS': {
-#         'docusign': 'django_docusign.backend.DocuSignBackend',
-#     },
-#     'SIGNATURE_TYPE_MODEL': 'forms.models.SignatureType',
-#     'SIGNATURE_MODEL': 'forms.models.Signature',
-#     'SIGNER_MODEL': 'forms.models.Signer',
-# }
-#
-# DOCUSIGN_ROOT_URL = "https://demo.docusign.net/restapi/v2/accounts/1751730"
-# DOCUSIGN_USERNAME = "17548b05-68c2-4ed9-b247-fd341816fa1d"
-# DOCUSIGN_PASSWORD = "raiseforms2016"
-# DOCUSIGN_ACCOUNT_ID = "8251a03b-7383-4c76-988f-eca37f82c0e7"
-
 # Hellosign config
 HELLOSIGN_API_KEY = "1955fc7886b608d52e2351ddee5c8ac327eb8eee89c6aa6f7fc10a0ddc347210"
 TEMPLATE_IDS = {
     "NDA": "f5adc3e183b9f8ea849a5193143c3f263bc2cc15"
 }
 CLIENT_ID = "994aa15e2cd50a8d0f7eb56f229271c2"
+
+# MailGun config - Change once custom domain is setup
+MAILGUN_BASE_URL = 'https://api.mailgun.net/v3/appe34584eef5e0419c94d1c33e9912012c.mailgun.org'
+MAILGUN_API_KEY = 'key-8fa35e646e4761a1a11ade3d7f78a5f5'
+MAILGUN_EMAIL_ADDRESS = 'admin@raiseforms.herokuapp.com'
+# Try nicer looking email address.

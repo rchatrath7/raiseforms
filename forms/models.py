@@ -3,6 +3,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db.models.signals import post_save
 import raiseforms.settings as settings
+import os
+from datetime import datetime, timedelta
+
 # Create your models here.
 
 
@@ -44,7 +47,6 @@ class AbstractUserManager(BaseUserManager):
 
 class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=40, unique=True)
 
     first_name = models.CharField(max_length=40, blank=True)
     last_name = models.CharField(max_length=40, blank=True)
@@ -66,7 +68,6 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     objects = AbstractUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
 
     def __unicode__(self):
         return self.email
@@ -79,11 +80,24 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
 
     @property
     def is_active(self):
-        return True
+        return self.account_type == 'E'
 
     @property
     def is_staff(self):
         return self.is_active
+
+    @property
+    def auth_token(self):
+        if self.account_type == 'C':
+            return os.urandom(8).encode('hex')
+
+    @property
+    def expired(self):
+        return datetime.utcnow() + timedelta(2)
+
+    @property
+    def is_redeemable(self):
+        return self.expired > datetime.utcnow() and not self.is_active
 
     class Meta:
         verbose_name = 'User'
@@ -219,7 +233,7 @@ class Client(models.Model):
 
     # Relations
     executive = models.ForeignKey(Executive)
-    nda = models.ForeignKey(NDA)
+    nda = models.ForeignKey(NDA, null=True)
     statement_of_work = models.ForeignKey(StatementOfWork)
     consulting_agreement = models.ForeignKey(ConsultingAgreement)
     # Purchase Request ForeignKey

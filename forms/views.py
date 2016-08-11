@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test, per
 import sys
 from forms import *
 from models import *
+from forms.utils import *
 from hellosign_sdk import HSClient as HS
 
 # Create your views here.
@@ -19,6 +20,9 @@ def user_is_executive(request):
         return False
 
 
+# def user_has_token(request, token):
+#     if request.user.
+
 def login_handler(request):
     if request.method == 'POST':
         username = request.POST['username'].encode('utf-8')
@@ -27,7 +31,7 @@ def login_handler(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return redirect('/')
+                return redirect(request.GET['next'])
             else:
                 pass
                 # Raise inactive user error
@@ -54,19 +58,69 @@ def home(request):
     return render(request, 'partials/home.html')
 
 
-@login_required(login_url='/login')
+@login_required(login_url='/login/')
 @user_passes_test(user_is_executive)
 def search(request):
     if request.method == 'POST':
         email = request.POST['email']
         emails = Client.user.objects.values_list('email', flat=True)
         if email in emails:
-            return render(request, 'search-results', {'emails': emails})
+            return render(request, 'partials/search-results.html', {'emails': emails})
         else:
-            return render(request, 'search-results', {'emails': []})
+            return render(request, 'partials/search-results.html', {'emails': []})
 
 
 @login_required(login_url='/login/')
+@user_passes_test(user_is_executive)
+def invite_client(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        tokenized_user = AbstractUserModel(email=email, account_type='c')
+        tokenized_user.set_unusable_password()
+        tokenized_user.save()
+        auth_token = tokenized_user.invitation
+        auth_url = request.get_host() + 'accounts/register/' + auth_token
+        send_mail(recipients=[email],
+                  subject="Please register your Raise-Forms client account!",
+                  message="You have been invited to create a raise-forms account by {0}. Please fill click {0} " \
+                          "and fill out all fields so that you can begin the on-boarding process at " \
+                          "Raise. Thanks!".format(auth_url),
+                  from_name=request.user.get_full_name(),
+                  reply_to=email,
+                  request=request
+                  )
+        # Render success to success page
+        # redirect()
+    else:
+        return render(request, 'partials/invite-client.html')
+
+
+# @user_passes_test()
+def register(request, auth_token):
+    if auth_token:
+        token = AbstractUserModel.objects.get('auth_token' == auth_token)
+        if not token.expired and not token.is_active:
+            if request.method == 'POST':
+                form = ClientForm(request.POST)
+                if form.is_valid():
+                    cd = form.cleaned_data
+                    for key in cd:
+                        if key != 'password':
+                            token.key = cd[key]
+                    token.set_password(cd['password'])
+                else:
+                    return render(request, 'partials/register-form.html', {'user': token, 'form': form})
+                token.save()
+                return render(request, 'partials/success-page.html')
+            else:
+                form = ClientForm()
+                return render(request, 'partials/register-form.html', {'user': token, 'form': form})
+        else:
+            return render('request', 'partials/login.html')
+
+
+@login_required(login_url='/login/')
+@user_passes_test(user_is_executive)
 def client_panel(request):
     """
     This handles the commands for interfacing with a specific user. If we don't have the basic information of the user,
@@ -135,7 +189,7 @@ def nda(request, user_id):
             generic_template_handler(request, "NDA", custom_fields)
             return render(request, 'partials/nda_form.html', {'embed_url': ""})
         else:
-            return render(request, 'partials/nda_form.html')
+            return render(request, 'partials/nda_form.html', {'nda_form': form})
     else:
         form = NDAForm()
     return render(request, 'partials/nda_form.html', {'nda_form': form})
