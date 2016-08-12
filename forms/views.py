@@ -1,12 +1,18 @@
 from django.shortcuts import render, redirect
+
 from django.conf import settings
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
-import sys
+
+from django.core.mail import EmailMultiAlternatives
+
 from forms import *
 from models import *
-from raiseforms.utils import *
+
 from hellosign_sdk import HSClient as HS
+
+import sys
 
 # Create your views here.
 # TODO: Compartmentalize the forms view to handle one thing at a time.
@@ -80,17 +86,14 @@ def invite_client(request):
         #tokenized_user.save()
         auth_token = tokenized_user.invitation
         auth_url = request.get_host() + 'accounts/register/' + auth_token
-        print >> sys.stderr, "<{0}: Sending email from {0} with {0}>".format(settings.MAILGUN_EMAIL_ADDRESS, settings.MAILGUN_BASE_URL, settings.MAILGUN_API_KEY)
-        resp = send_mail(recipients=[email, request.user.email],
-                         subject="Please register your Raise-Forms client account!",
-                         message="You have been invited to create a raise-forms account by {0}. Please fill click {0} " \
-                                 "and fill out all fields so that you can begin the on-boarding process at " \
-                                 "Raise. Thanks!".format(tokenized_user.expired, auth_url),
-                         from_name=request.user.get_full_name(),
-                         reply_to=email,
-                         request=request
-                         )
-        print >> sys.stderr, resp
+        msg = EmailMultiAlternatives(
+            subject="Please register your Raise-Forms client account!",
+            body="You have been invited to create a raise-forms account by {0}. Please fill click {0} " \
+                 "and fill out all fields so that you can begin the on-boarding process at " \
+                 "Raise. Thanks!".format(tokenized_user.expired, auth_url),
+            to=[email, request.user.email])
+        print >> sys.stderr, msg
+        msg.send()
         redirect('/')
         # Render success to success page
         # redirect()

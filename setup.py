@@ -9,6 +9,7 @@ requires = [
     'whitenoise',
     'dj-database-url',
     'requires',
+    'django-anymail[mailgun]',
 ]
 
 setup(
