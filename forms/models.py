@@ -239,10 +239,10 @@ class Client(models.Model):
 
 def abstract_user_creation(sender, instance, created, **kwargs):
     if created:
-        if sender.get('account_type') == 'C':
+        if sender.account_type == 'C':
             Client.objects.create(user=instance)
         else:
             Executive.objects.create(user=instance)
             print >> sys.stderr, "Stuff: %s" % kwargs
 
-post_save.connect(abstract_user_creation, sender=AbstractUserModel, account_type=AbstractUserModel.account_type)
+post_save.connect(abstract_user_creation, sender=AbstractUserModel)
