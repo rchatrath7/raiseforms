@@ -154,7 +154,10 @@ TEMPLATE_IDS = {
 CLIENT_ID = "994aa15e2cd50a8d0f7eb56f229271c2"
 
 # MailGun config - Change once custom domain is setup
-MAILGUN_BASE_URL = 'https://api.mailgun.net/v3/appe34584eef5e0419c94d1c33e9912012c.mailgun.org'
-MAILGUN_API_KEY = 'key-8fa35e646e4761a1a11ade3d7f78a5f5'
-MAILGUN_EMAIL_ADDRESS = 'admin@raiseforms.herokuapp.com'
+#MAILGUN_BASE_URL = 'https://api.mailgun.net/v3/appe34584eef5e0419c94d1c33e9912012c.mailgun.org'
+MAILGUN_BASE_URL = os.environ('MAILGUN_BASE_URL')
+MAILGUN_API_KEY = os.environ('MAILGUIN_API_KEY')
+
+# MAILGUN_API_KEY = 'key-8fa35e646e4761a1a11ade3d7f78a5f5'
+# MAILGUN_EMAIL_ADDRESS = 'admin@appe34584eef5e0419c94d1c33e9912012c.mailgun.org'
 # Try nicer looking email address.

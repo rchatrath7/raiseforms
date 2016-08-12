@@ -80,15 +80,17 @@ def invite_client(request):
         tokenized_user.save()
         auth_token = tokenized_user.invitation
         auth_url = request.get_host() + 'accounts/register/' + auth_token
-        send_mail(recipients=[email, request.user.email],
-                  subject="Please register your Raise-Forms client account!",
-                  message="You have been invited to create a raise-forms account by {0}. Please fill click {0} " \
-                          "and fill out all fields so that you can begin the on-boarding process at " \
-                          "Raise. Thanks!".format(tokenized_user.expired, auth_url),
-                  from_name=request.user.get_full_name(),
-                  reply_to=email,
-                  request=request
-                  )
+        print >> sys.stderr, "Sending email"
+        resp = send_mail(recipients=[email, request.user.email],
+                         subject="Please register your Raise-Forms client account!",
+                         message="You have been invited to create a raise-forms account by {0}. Please fill click {0} " \
+                                 "and fill out all fields so that you can begin the on-boarding process at " \
+                                 "Raise. Thanks!".format(tokenized_user.expired, auth_url),
+                         from_name=request.user.get_full_name(),
+                         reply_to=email,
+                         request=request
+                         )
+        print >> sys.stderr, resp
         # Render success to success page
         # redirect()
     else:

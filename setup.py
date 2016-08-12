@@ -8,6 +8,7 @@ requires = [
     'gunicorn',
     'whitenoise',
     'dj-database-url',
+    'requires',
 ]
 
 setup(
