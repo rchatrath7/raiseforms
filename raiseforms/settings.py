@@ -160,5 +160,5 @@ ANYMAIL = {
     "MAILGUN_SENDER_DOMAIN": os.environ['MAILGUN_DOMAIN'],
 }
 EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
-DEFAULT_FROM_EMAIL = "Raise Forms Mailer <admin@appe34584eef5e0419c94d1c33e9912012c.mailgun.org>"
+DEFAULT_FROM_EMAIL = "Raise Forms Mailer <admin@raiseforms.com>"
 # Try nicer looking email address.
