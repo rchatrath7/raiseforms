@@ -87,7 +87,7 @@ def invite_client(request):
         tokenized_user.set_unusable_password()
         tokenized_user.save()
         auth_token = tokenized_user.invitation
-        auth_url = Site.objects.get_current(request).domain + '/accounts/register/' + auth_token
+        auth_url = request.META['HTTP_HOST'] + '/accounts/register/' + auth_token
         msg = EmailMultiAlternatives(
             subject="Please register your Raise-Forms client account!",
             body="You have been invited to create a raise-forms account by %s. Please click %s " \
