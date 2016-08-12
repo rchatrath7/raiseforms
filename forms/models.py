@@ -63,8 +63,6 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     is_admin.help_text = "All Executives are considered Admins, but Clients are not."
     is_admin.disabled = True
 
-    _token = models.CharField(8)
-
     objects = AbstractUserManager()
 
     USERNAME_FIELD = 'email'
