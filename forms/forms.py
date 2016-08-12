@@ -5,12 +5,11 @@ from localflavor.us import forms as lf_forms
 
 class ClientForm(forms.Form):
     # TODO: Consolidated address into pieces validated through lfForm Fields
-    first_name = forms.CharField(max_length=50)
-    last_name = forms.CharField(max_length=50)
-    user_name = forms.CharField(max_length=50)
-    password = forms.CharField(widget=widgets.PasswordInput)
-    email = forms.EmailField(max_length=30, widget=widgets.EmailInput)
-    address = forms.CharField(max_length=100)
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
+    password = forms.CharField(widget=widgets.PasswordInput(attrs={'class': 'pure-u-1'}))
+    email = forms.EmailField(widget=widgets.EmailInput(attrs={'class': 'pure-u-1'}))
+    address = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
 
 
 class NDAForm(forms.Form):

@@ -1,0 +1,32 @@
+{% extends 'partials/index.html' %}
+{% block content %}
+    <div class="centered-container">
+        <div class="centered">
+            <div class="floating-control-panel">
+                <h1>Welcome to Raise's form automation system!</h1>
+                <p>Please register an account.</p>
+                <form class="pure-form pure-form-stacked" action="" method="post">
+                    <fieldset>
+                        {% if form.errors %}
+                            <div class="pure-u-1 error-text">
+                                <p> Please correct the following {{ form.errors | pluralize }} below.</p>
+                            </div>
+                        {% endif %}
+                        <div class="pure-g">
+                            {% for field in form %}
+                                <div class="pure-u-1">
+                                    {{ field.label }}
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                            {% csrf_token %}
+                            <div class="pure-u-1">
+                                <input class="btn green pure-u-1" type="submit" value="Register!">
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

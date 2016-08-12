@@ -1,0 +1,26 @@
+{% extends 'partials/index.html' %}
+{% block content %}
+    <div class="centered-container">
+        <div class="centered">
+            <div class="floating-control-panel">
+                <h1>Invite a new client to Raise form automation system!</h1>
+                <p>Please enter the client's email address</p>
+                <form class="pure-form pure-form-stacked" action="" method="post">
+                    <fieldset>
+                        <div class="pure-g">
+                            <div class="pure-u-1">
+                                <div class="search">
+                                    <input type="text" class="pure-u-1" name='email' placeholder="Enter the new client's Email.">
+                                    {% csrf_token %}
+                                </div>
+                            </div>
+                            <div class="pure-u-1">
+                                <input type="submit" class="btn green pure-u-1" value="Email Invitation" style="text-align:center">
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -23,11 +23,8 @@ class AbstractUserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have a valid email address.')
 
-        if not kwargs.get('username'):
-            raise ValueError('Users must have a valid username.')
-
         user = self.model(
-            email=self.normalize_email(email), username=kwargs.get('username')
+            email=self.normalize_email(email)
         )
 
         user.set_password(password)
@@ -87,7 +84,7 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
         return self.is_active
 
     @property
-    def auth_token(self):
+    def invitation(self):
         if self.account_type == 'C':
             return os.urandom(8).encode('hex')
 
@@ -97,7 +94,7 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
 
     @property
     def is_redeemable(self):
-        return self.expired > datetime.utcnow() and not self.is_active
+        return self.expired < datetime.utcnow() and not self.is_active
 
     class Meta:
         verbose_name = 'User'
@@ -224,18 +221,18 @@ class Client(models.Model):
     # The client is the person signing. We want to be able to send them multiple forms if possible, as well as gather
     # All necessary information at once.
     # TODO: Figure out file uploading/googledocs support.
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
-    address = models.CharField(max_length=100)
-    nda_file = models.FileField(upload_to=file_upload_path)
-    statement_of_work_file = models.FileField(upload_to=file_upload_path)
-    consulting_agreement_file = models.FileField(upload_to=file_upload_path)
-    purchase_request_file = models.FileField(upload_to=file_upload_path)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True)
+    address = models.CharField(max_length=100, null=True)
+    nda_file = models.FileField(upload_to=file_upload_path, null=True)
+    statement_of_work_file = models.FileField(upload_to=file_upload_path, null=True)
+    consulting_agreement_file = models.FileField(upload_to=file_upload_path, null=True)
+    purchase_request_file = models.FileField(upload_to=file_upload_path, null=True)
 
     # Relations
-    executive = models.ForeignKey(Executive)
+    executive = models.ForeignKey(Executive, null=True)
     nda = models.ForeignKey(NDA, null=True)
-    statement_of_work = models.ForeignKey(StatementOfWork)
-    consulting_agreement = models.ForeignKey(ConsultingAgreement)
+    statement_of_work = models.ForeignKey(StatementOfWork, null=True)
+    consulting_agreement = models.ForeignKey(ConsultingAgreement, null=True)
     # Purchase Request ForeignKey
 
 

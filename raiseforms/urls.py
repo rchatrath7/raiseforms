@@ -22,11 +22,12 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', views.home, name='home'),
+    url(r'^$', views.home),
     url(r'^home/$', views.home),
     url(r'^login/$', views.login_handler),
     url(r'^logout/$', views.logout_handler),
-    url(r'^accoutns/register/(?P<auth_token>\d)', views.register),
+    url(r'^accounts/invite', views.invite_client),
+    url(r'^accounts/register/(?P<auth_token>\d)', views.register),
     url(r'^clients/(?P<user_id>\d)/$', views.client_panel),
     url(r'^clients/(?P<user_id>\d)/forms/nda/$', views.nda),
     url(r'^clients/(?P<user_id>\d)/forms/statement_of_work/$', views.statement_of_work),

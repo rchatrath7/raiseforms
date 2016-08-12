@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test, per
 import sys
 from forms import *
 from models import *
-from forms.utils import *
+from raiseforms.utils import *
 from hellosign_sdk import HSClient as HS
 
 # Create your views here.
@@ -14,7 +14,7 @@ from hellosign_sdk import HSClient as HS
 
 
 def user_is_executive(request):
-    if request.user.account_type == 'E':
+    if request.account_type == 'E':
         return True
     else:
         return False
@@ -75,16 +75,16 @@ def search(request):
 def invite_client(request):
     if request.method == 'POST':
         email = request.POST['email']
-        tokenized_user = AbstractUserModel(email=email, account_type='c')
+        tokenized_user = AbstractUserModel(email=email, account_type='C')
         tokenized_user.set_unusable_password()
         tokenized_user.save()
         auth_token = tokenized_user.invitation
         auth_url = request.get_host() + 'accounts/register/' + auth_token
-        send_mail(recipients=[email],
+        send_mail(recipients=[email, request.user.email],
                   subject="Please register your Raise-Forms client account!",
                   message="You have been invited to create a raise-forms account by {0}. Please fill click {0} " \
                           "and fill out all fields so that you can begin the on-boarding process at " \
-                          "Raise. Thanks!".format(auth_url),
+                          "Raise. Thanks!".format(tokenized_user.expired, auth_url),
                   from_name=request.user.get_full_name(),
                   reply_to=email,
                   request=request
@@ -98,23 +98,25 @@ def invite_client(request):
 # @user_passes_test()
 def register(request, auth_token):
     if auth_token:
-        token = AbstractUserModel.objects.get('auth_token' == auth_token)
+        token = AbstractUserModel.objects.get('invitation' == auth_token)
         if not token.expired and not token.is_active:
             if request.method == 'POST':
                 form = ClientForm(request.POST)
                 if form.is_valid():
                     cd = form.cleaned_data
-                    for key in cd:
-                        if key != 'password':
-                            token.key = cd[key]
+                    # temporary solution
+                    token.first_name = cd['first_name']
+                    token.last_name = cd['last_name']
+                    token.email = cd['email']
+                    token.client.address = cd['address']
                     token.set_password(cd['password'])
+                    token.save()
                 else:
-                    return render(request, 'partials/register-form.html', {'user': token, 'form': form})
-                token.save()
+                    return render(request, 'partials/register-form.html', {'form': form})
                 return render(request, 'partials/success-page.html')
             else:
-                form = ClientForm()
-                return render(request, 'partials/register-form.html', {'user': token, 'form': form})
+                form = ClientForm(initial={'email': token.email})
+                return render(request, 'partials/register-form.html', {'form': form})
         else:
             return render('request', 'partials/login.html')
 
