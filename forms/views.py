@@ -77,11 +77,10 @@ def invite_client(request):
         email = request.POST['email']
         tokenized_user = AbstractUserModel(email=email, account_type='C')
         tokenized_user.set_unusable_password()
-        tokenized_user.save()
+        #tokenized_user.save()
         auth_token = tokenized_user.invitation
         auth_url = request.get_host() + 'accounts/register/' + auth_token
-        print >> sys.stderr, "<{0}: Sending email from {0}>".format(settings.MAILGUN_EMAIL_ADDRESS,
-                                                                    settings.MAILGUN_BASE_URL)
+        print >> sys.stderr, "<{0}: Sending email from {0} with {0}>".format(settings.MAILGUN_EMAIL_ADDRESS, settings.MAILGUN_BASE_URL, settings.MAILGUN_API_KEY)
         resp = send_mail(recipients=[email, request.user.email],
                          subject="Please register your Raise-Forms client account!",
                          message="You have been invited to create a raise-forms account by {0}. Please fill click {0} " \
