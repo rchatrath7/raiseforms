@@ -87,7 +87,7 @@ def invite_client(request):
         tokenized_user.set_unusable_password()
         tokenized_user.save()
         auth_token = tokenized_user.invitation
-        auth_url = request.META['HTTP_HOST'] + '/accounts/register/' + auth_token
+        auth_url = request.META['HTTP_'] + '/accounts/register/' + auth_token
         msg = EmailMultiAlternatives(
             subject="Please register your Raise-Forms client account!",
             body="You have been invited to create a raise-forms account by %s. Please click %s " \
@@ -106,7 +106,7 @@ def invite_client(request):
 # @user_passes_test()
 def register(request, auth_token):
     if auth_token:
-        token = AbstractUserModel.objects.get('invitation' == str(auth_token))
+        token = AbstractUserModel.objects.get(invitation=auth_token)
         if not token.expired and not token.is_active:
             if request.method == 'POST':
                 form = ClientForm(request.POST)
