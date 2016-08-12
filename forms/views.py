@@ -91,6 +91,7 @@ def invite_client(request):
                          request=request
                          )
         print >> sys.stderr, resp
+        redirect('/')
         # Render success to success page
         # redirect()
     else:
