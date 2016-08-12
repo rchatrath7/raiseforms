@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db.models.signals import post_save
 import raiseforms.settings as settings
 import os
+import sys
 from datetime import datetime, timedelta
 
 # Create your models here.
@@ -238,9 +239,10 @@ class Client(models.Model):
 
 def abstract_user_creation(sender, instance, created, **kwargs):
     if created:
-        if kwargs.get('account_type') == 'C':
+        if sender.get('account_type') == 'C':
             Client.objects.create(user=instance)
         else:
             Executive.objects.create(user=instance)
+            print >> sys.stderr, "Stuff: %s" % kwargs
 
-post_save.connect(abstract_user_creation, sender=AbstractUserModel)
+post_save.connect(abstract_user_creation, sender=AbstractUserModel, account_type=AbstractUserModel.account_type)
