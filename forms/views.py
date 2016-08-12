@@ -80,7 +80,7 @@ def invite_client(request):
         tokenized_user.save()
         auth_token = tokenized_user.invitation
         auth_url = request.get_host() + 'accounts/register/' + auth_token
-        print >> sys.stderr, "Sending email"
+        print >> sys.stderr, "<{0}: Sending email>".format(settings.MAILGUN_EMAIL_ADDRESS)
         resp = send_mail(recipients=[email, request.user.email],
                          subject="Please register your Raise-Forms client account!",
                          message="You have been invited to create a raise-forms account by {0}. Please fill click {0} " \
