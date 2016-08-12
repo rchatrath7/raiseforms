@@ -85,7 +85,7 @@ def invite_client(request):
         email = request.POST['email']
         tokenized_user = AbstractUserModel(email=email, account_type='C')
         tokenized_user.set_unusable_password()
-        #tokenized_user.save()
+        tokenized_user.save()
         auth_token = tokenized_user.invitation
         auth_url = Site.objects.get_current(request).domain + '/accounts/register/' + auth_token
         msg = EmailMultiAlternatives(
@@ -94,8 +94,8 @@ def invite_client(request):
                  "and fill out all fields so that you can begin the on-boarding process at " \
                  "Raise. Thanks!" % (tokenized_user.expired, auth_url),
             to=[email, request.user.email])
-        print >> sys.stderr, msg
-        msg.send()
+        print >> sys.stderr, auth_url
+        #msg.send()
         return redirect('/')
         # Render success to success page
         # redirect()
@@ -106,7 +106,7 @@ def invite_client(request):
 # @user_passes_test()
 def register(request, auth_token):
     if auth_token:
-        token = AbstractUserModel.objects.get('invitation' == auth_token)
+        token = AbstractUserModel.objects.get('invitation' == str(auth_token))
         if not token.expired and not token.is_active:
             if request.method == 'POST':
                 form = ClientForm(request.POST)
