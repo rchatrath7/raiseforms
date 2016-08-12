@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'forms',
     'anymail',
 ]
@@ -153,6 +154,8 @@ TEMPLATE_IDS = {
     "NDA": "f5adc3e183b9f8ea849a5193143c3f263bc2cc15"
 }
 CLIENT_ID = "994aa15e2cd50a8d0f7eb56f229271c2"
+
+SITE_ID=1
 
 # MailGun config - Change once custom domain is setup - using django-anymail
 ANYMAIL = {

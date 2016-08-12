@@ -5,6 +5,8 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 
+from django.contrib.sites.models import Site
+
 from django.core.mail import EmailMultiAlternatives
 
 from forms import *
@@ -85,7 +87,7 @@ def invite_client(request):
         tokenized_user.set_unusable_password()
         #tokenized_user.save()
         auth_token = tokenized_user.invitation
-        auth_url = request.get_host() + 'accounts/register/' + auth_token
+        auth_url = Site.objects.get_current(request).domain + '/accounts/register/' + auth_token
         msg = EmailMultiAlternatives(
             subject="Please register your Raise-Forms client account!",
             body="You have been invited to create a raise-forms account by %s. Please click %s " \
