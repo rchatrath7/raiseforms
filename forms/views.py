@@ -95,7 +95,7 @@ def invite_client(request):
                  "Raise. Thanks!" % (tokenized_user.expired, auth_url),
             to=[email, request.user.email])
         print >> sys.stderr, auth_url
-        #msg.send()
+        msg.send()
         return redirect('/')
         # Render success to success page
         # redirect()
