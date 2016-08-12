@@ -88,13 +88,13 @@ def invite_client(request):
         auth_url = request.get_host() + 'accounts/register/' + auth_token
         msg = EmailMultiAlternatives(
             subject="Please register your Raise-Forms client account!",
-            body="You have been invited to create a raise-forms account by {0}. Please fill click {0} " \
+            body="You have been invited to create a raise-forms account by %s. Please click %s " \
                  "and fill out all fields so that you can begin the on-boarding process at " \
-                 "Raise. Thanks!".format(tokenized_user.expired, auth_url),
+                 "Raise. Thanks!" % (tokenized_user.expired, auth_url),
             to=[email, request.user.email])
         print >> sys.stderr, msg
         msg.send()
-        redirect('/')
+        return redirect('/')
         # Render success to success page
         # redirect()
     else:
