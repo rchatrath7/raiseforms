@@ -63,6 +63,8 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     is_admin.help_text = "All Executives are considered Admins, but Clients are not."
     is_admin.disabled = True
 
+    _token = models.CharField(8)
+
     objects = AbstractUserManager()
 
     USERNAME_FIELD = 'email'
@@ -243,6 +245,6 @@ def abstract_user_creation(sender, instance, created, **kwargs):
             Client.objects.create(user=instance)
         else:
             Executive.objects.create(user=instance)
-            print >> sys.stderr, "Stuff: %s" % kwargs
+            print >> sys.stderr, "Stuff: <%s> <%s>" % (sender.account_type, sender)
 
 post_save.connect(abstract_user_creation, sender=AbstractUserModel)

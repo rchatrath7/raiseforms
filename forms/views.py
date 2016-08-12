@@ -106,7 +106,9 @@ def invite_client(request):
 # @user_passes_test()
 def register(request, auth_token):
     if auth_token:
-        token = AbstractUserModel.objects.get(invitation=auth_token)
+        tokens = [token for token in AbstractUserModel.objects.all() if token.invitation == auth_token]
+        # Handle this better.
+        token = tokens[0]
         if not token.expired and not token.is_active:
             if request.method == 'POST':
                 form = ClientForm(request.POST)
