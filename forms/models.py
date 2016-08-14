@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db.models.signals import post_save
+from django.dispatch import receiver
 import raiseforms.settings as settings
 import sys
 from datetime import datetime, timedelta
@@ -62,7 +63,7 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     is_admin.help_text = "All Executives are considered Admins, but Clients are not."
     is_admin.disabled = True
 
-    token = models.CharField(max_length=8, null=True)
+    token = models.CharField(max_length=16, null=True)
 
     objects = AbstractUserManager()
 
@@ -233,12 +234,12 @@ class Client(models.Model):
     # Purchase Request ForeignKey
 
 
+@receiver(post_save, sender=AbstractUserModel)
 def abstract_user_creation(sender, instance, created, **kwargs):
     if created:
-        if sender.account_type == 'C':
+        print >> sys.stderr, instance
+        print >> sys.stderr, instance.account_type
+        if instance.account_type == 'C':
             Client.objects.create(user=instance)
         else:
             Executive.objects.create(user=instance)
-            print >> sys.stderr, "Stuff: <%s> <%s>" % (sender.account_type, sender)
-
-post_save.connect(abstract_user_creation, sender=AbstractUserModel)

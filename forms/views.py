@@ -18,7 +18,6 @@ import sys
 import os
 
 # Create your views here.
-# TODO: Compartmentalize the forms view to handle one thing at a time.
 # TODO: Add an "all-purpose" form view
 
 
@@ -105,15 +104,10 @@ def invite_client(request):
 
 # @user_passes_test()
 def register(request, auth_token):
-    if auth_token:
-        tokens = AbstractUserModel.objects.filter(account_type='C').filter(token=auth_token)
-                  # if token.invitation.encode('utf-8') == auth_token.encode('utf-8')]
-        # Handle this better.
-        if len(tokens) > 0:
-            token = tokens[0]
-        else:
-            token = None
-        if not token.expired and not token.is_active:
+    token = AbstractUserModel.objects.get(token=auth_token)
+    if token:
+        is_expired = datetime.utcnow() >= token.expired
+        if not is_expired and not token.is_active:
             if request.method == 'POST':
                 form = ClientForm(request.POST)
                 if form.is_valid():
@@ -132,7 +126,11 @@ def register(request, auth_token):
                 form = ClientForm(initial={'email': token.email})
                 return render(request, 'partials/register-form.html', {'form': form})
         else:
-            return render('request', 'partials/login.html')
+            pass
+            # Return expired token error.
+    else:
+        # Raise invalid token error - use try/catch
+        return render('request', 'partials/login.html')
 
 
 @login_required(login_url='/login/')
