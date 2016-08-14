@@ -15,6 +15,7 @@ from models import *
 from hellosign_sdk import HSClient as HS
 
 import sys
+import os
 
 # Create your views here.
 # TODO: Compartmentalize the forms view to handle one thing at a time.
@@ -83,18 +84,17 @@ def search(request):
 def invite_client(request):
     if request.method == 'POST':
         email = request.POST['email']
-        tokenized_user = AbstractUserModel(email=email, account_type='C')
+        token = os.urandom(8).encode('hex')
+        tokenized_user = AbstractUserModel(email=email, account_type='C', token=token)
         tokenized_user.set_unusable_password()
         tokenized_user.save()
-        auth_token = tokenized_user.invitation
-        auth_url = request.META['HTTP_HOST'] + '/accounts/register/' + auth_token
+        auth_url = request.META['HTTP_HOST'] + '/accounts/register/' + token
         msg = EmailMultiAlternatives(
             subject="Please register your Raise-Forms client account!",
             body="You have been invited to create a raise-forms account by %s. Please click %s " \
                  "and fill out all fields so that you can begin the on-boarding process at " \
                  "Raise. Thanks!" % (tokenized_user.expired, auth_url),
             to=[email, request.user.email])
-        print >> sys.stderr, auth_url
         msg.send()
         return redirect('/')
         # Render success to success page
@@ -106,9 +106,13 @@ def invite_client(request):
 # @user_passes_test()
 def register(request, auth_token):
     if auth_token:
-        tokens = [token for token in AbstractUserModel.objects.all() if token.invitation == auth_token]
+        tokens = AbstractUserModel.objects.filter(account_type='C').filter(token=auth_token)
+                  # if token.invitation.encode('utf-8') == auth_token.encode('utf-8')]
         # Handle this better.
-        token = tokens[0]
+        if len(tokens) > 0:
+            token = tokens[0]
+        else:
+            token = None
         if not token.expired and not token.is_active:
             if request.method == 'POST':
                 form = ClientForm(request.POST)

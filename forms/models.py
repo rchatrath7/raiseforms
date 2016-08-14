@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db.models.signals import post_save
 import raiseforms.settings as settings
-import os
 import sys
 from datetime import datetime, timedelta
 
@@ -63,6 +62,8 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     is_admin.help_text = "All Executives are considered Admins, but Clients are not."
     is_admin.disabled = True
 
+    token = models.CharField(max_length=8, null=True)
+
     objects = AbstractUserManager()
 
     USERNAME_FIELD = 'email'
@@ -83,11 +84,6 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     @property
     def is_staff(self):
         return self.is_active
-
-    @property
-    def invitation(self):
-        if self.account_type == 'C':
-            return os.urandom(8).encode('hex')
 
     @property
     def expired(self):
