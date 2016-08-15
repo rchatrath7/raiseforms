@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from django.conf import settings
 
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 
@@ -41,11 +42,9 @@ def login_handler(request):
                 login(request, user)
                 return redirect(request.GET['next'])
             else:
-                pass
-                # Raise inactive user error
+                messages.error(request, 'Invalid User! This user has an inactive account, please renew their account.')
         else:
-            pass
-            # Raise invalid login message.
+            messages.error(request, 'Invalid credentials! Either your username or password were not valid.')
     else:
         return render(request, 'partials/login.html')
 
@@ -71,11 +70,8 @@ def home(request):
 def search(request):
     if request.method == 'POST':
         email = request.POST['email']
-        emails = Client.user.objects.values_list('email', flat=True)
-        if email in emails:
-            return render(request, 'partials/search-results.html', {'emails': emails})
-        else:
-            return render(request, 'partials/search-results.html', {'emails': []})
+        emails = AbstractUserModel.objects.get(email=email)
+        return render(request, 'partials/search-results.html', {'emails': [emails]})
 
 
 @login_required(login_url='/login/')
@@ -90,14 +86,13 @@ def invite_client(request):
         auth_url = request.META['HTTP_HOST'] + '/accounts/register/' + token
         msg = EmailMultiAlternatives(
             subject="Please register your Raise-Forms client account!",
-            body="You have been invited to create a raise-forms account by %s. Please click %s " \
+            body="You have been invited to create a raise-forms account. Please click %s " \
                  "and fill out all fields so that you can begin the on-boarding process at " \
-                 "Raise. Thanks!" % (tokenized_user.expired, auth_url),
+                 "Raise. Thanks! Note: this URL wil expire in exactly two days from now." % auth_url,
             to=[email, request.user.email])
         msg.send()
-        return redirect('/')
-        # Render success to success page
-        # redirect()
+        messages.success(request, 'Success! The client, %s, has been emailed a link to register with raise-forms.') \
+            % email
     else:
         return render(request, 'partials/invite-client.html')
 
@@ -119,18 +114,19 @@ def register(request, auth_token):
                     token.client.address = cd['address']
                     token.set_password(cd['password'])
                     token.save()
+                    token.client.save()
                 else:
                     return render(request, 'partials/register-form.html', {'form': form})
-                return render(request, 'partials/success-page.html')
+                messages.success(request, "You have successfully registered with raise-forms! Please wait for your "
+                                          "Raise executive to send you the required forms.")
             else:
                 form = ClientForm(initial={'email': token.email})
                 return render(request, 'partials/register-form.html', {'form': form})
         else:
-            pass
-            # Return expired token error.
+            messages.error(request, "Sorry, this URL has expired. Please contact your Raise executive to invite you.")
     else:
-        # Raise invalid token error - use try/catch
-        return render('request', 'partials/login.html')
+            messages.error(request, "Sorry, this URL is not valid. Please wait for your Raise executive to send you "
+                                    "a valid invitation.")
 
 
 @login_required(login_url='/login/')
@@ -161,6 +157,7 @@ def forms(request):
 
 
 @login_required(login_url='/login/')
+@user_passes_test(user_is_executive)
 def nda(request, user_id):
     if request.method == 'POST':
         form = NDAForm(request.POST)
@@ -201,12 +198,12 @@ def nda(request, user_id):
                 request.user.client.nda = NDA.objects.get(id=nda.id)
                 request.user.client.save()
             generic_template_handler(request, "NDA", custom_fields)
-            return render(request, 'partials/nda_form.html', {'embed_url': ""})
+            messages.success(request, 'Success! The NDA form has been mailed for signatures.')
         else:
             return render(request, 'partials/nda_form.html', {'nda_form': form})
     else:
         form = NDAForm()
-    return render(request, 'partials/nda_form.html', {'nda_form': form})
+        return render(request, 'partials/nda_form.html', {'nda_form': form})
 
 
 @login_required(login_url='/login/')

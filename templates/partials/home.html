@@ -3,13 +3,14 @@
 <div class="centered-container">
     <div class="centered">
         <div class="floating-control-panel">
-            <form class="pure-form pure-form-stacked">
+            <form class="pure-form pure-form-stacked" action="accounts/search/" method="post">
                 <fieldset>
                     <div class="pure-g">
                          <div class="pure-u-1">
                              <div class="search">
                                  <span class="fa fa-search"></span>
-                                 <input type="text" class="pure-u-1" placeholder="Search for a client...">
+                                 <input type="text" class="pure-u-1" name="email" placeholder="Search for a client...">
+                                 {% csrf_token %}
                                  <input type="submit" value="">
                              </div>
                          </div>
