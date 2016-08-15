@@ -6,8 +6,6 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 
-from django.contrib.sites.models import Site
-
 from django.core.mail import EmailMultiAlternatives
 
 from forms import *

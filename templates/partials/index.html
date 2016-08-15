@@ -3,19 +3,39 @@
     <head>
             <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type="text/css"/>
             <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+            <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css">
             <link href="{% static 'bower_components/pure/pure-min.css' %}" rel="stylesheet" type="text/css"/>
             <link href="{% static 'bower_components/pure/grids-responsive-min.css' %}" rel="stylesheet" type="text/css"/>
             <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+            <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     </head>
     <body>
-        <div class="navigation-bar">
-            <ul>
-                <li><a class="active" href="">Home</a></li>
-                <li style="float:right"><a href="">Login</a></li>
-                <li style="float:right"><a href="">Password</a></li>
-                <li style="float:right"><a href="">Username</a></li>
-            </ul>
-        </div>
-        {% block content %}{% endblock content %}
+        {% block navigation %}
+            <div id="navbar">
+                <div class="navigation-bar">
+                    <ul>
+                        <li><a class="active" href="/home/">Home</a></li>
+                        <li style="float:right"><a href="">Login</a></li>
+                        <li style="float:right"><a href="">Password</a></li>
+                        <li style="float:right"><a href="">Username</a></li>
+                    </ul>
+                </div>
+            </div>
+        {% endblock navigation %}
+        {% block messages %}
+            <div id="messages">
+                 {% for message in messages %}
+                    {% if messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            <a class="close" data-dismiss="alert">x</a>
+                            {{ message|safe }}
+                        </div>
+                    {% endif  %}
+                {% endfor %}
+            </div>
+        {% endblock messages %}
+        {% block content %}
+            <div id="content"></div>
+        {% endblock content %}
     </body>
 </html>
