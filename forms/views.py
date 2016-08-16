@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from django.conf import settings
 
@@ -96,36 +96,37 @@ def invite_client(request):
 
 # @user_passes_test()
 def register(request, auth_token):
-    token = AbstractUserModel.objects.get(token=auth_token)
-    if token:
-        is_expired = datetime.utcnow() >= token.expired
-        if not is_expired and not token.is_active:
-            if request.method == 'POST':
-                form = ClientForm(request.POST)
-                if form.is_valid():
-                    cd = form.cleaned_data
-                    # temporary solution
-                    token.first_name = cd['first_name']
-                    token.last_name = cd['last_name']
-                    token.email = cd['email']
-                    token.client.address = cd['address']
-                    token.set_password(cd['password'])
-                    token.is_active = True
-                    token.save()
-                    token.client.save()
-                else:
-                    return render(request, 'partials/register-form.html', {'form': form})
-                messages.success(request, "You have successfully registered with raise-forms! Please wait for your "
-                                          "Raise executive to send you the required forms.")
-                return render(request, 'partials/register-form.html')
+    token = get_object_or_404(AbstractUserModel, token=auth_token)
+    is_expired = datetime.utcnow() >= token.expired
+    if not is_expired and not token.is_active:
+        if request.method == 'POST':
+            form = ClientForm(request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                # temporary solution
+                token.first_name = cd['first_name']
+                token.last_name = cd['last_name']
+                token.email = cd['email']
+                token.client.address = cd['address']
+                token.set_password(cd['password'])
+                token.is_active = True
+                token.save()
+                token.client.save()
             else:
-                form = ClientForm(initial={'email': token.email})
                 return render(request, 'partials/register-form.html', {'form': form})
+            messages.success(request, "You have successfully registered with raise-forms! Please wait for your "
+                                      "Raise executive to send you the required forms.")
+            return render(request, 'partials/register-form.html')
         else:
-            messages.error(request, "Sorry, this URL has expired. Please contact your Raise executive to invite you.")
+            form = ClientForm(initial={'email': token.email})
+            return render(request, 'partials/register-form.html', {'form': form})
     else:
-            messages.error(request, "Sorry, this URL is not valid. Please wait for your Raise executive to send you "
-                                    "a valid invitation.")
+        messages.error(request, "Sorry, this URL has expired. Please contact your Raise executive to invite you.")
+        return redirect('/')
+    # except DoesNotExist e:
+    #     messages.error(request, "Sorry, this URL is not valid. Please wait for your Raise executive to send you "
+    #                             "a valid invitation.")
+    #     return redirect('/')
 
 
 @login_required(login_url='/login/')

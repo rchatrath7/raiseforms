@@ -82,6 +82,10 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     def is_active(self):
         return self.account_type == 'E'
 
+    @is_active.setter
+    def is_active(self, value):
+        self.is_active = value
+
     @property
     def is_staff(self):
         return self.is_active
