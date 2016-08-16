@@ -89,8 +89,7 @@ def invite_client(request):
                  "Raise. Thanks! Note: this URL wil expire in exactly two days from now." % auth_url,
             to=[email, request.user.email])
         msg.send()
-        messages.success(request, 'Success! The client, %s, has been emailed a link to register with raise-forms.') \
-            % email
+        messages.success(request, 'The client has been emailed a link to register with raise-forms.')
     else:
         return render(request, 'partials/invite-client.html')
 
@@ -111,12 +110,14 @@ def register(request, auth_token):
                     token.email = cd['email']
                     token.client.address = cd['address']
                     token.set_password(cd['password'])
+                    token.is_active = True
                     token.save()
                     token.client.save()
                 else:
                     return render(request, 'partials/register-form.html', {'form': form})
                 messages.success(request, "You have successfully registered with raise-forms! Please wait for your "
                                           "Raise executive to send you the required forms.")
+                return render(request, 'partials/register-form.html')
             else:
                 form = ClientForm(initial={'email': token.email})
                 return render(request, 'partials/register-form.html', {'form': form})
@@ -196,7 +197,7 @@ def nda(request, user_id):
                 request.user.client.nda = NDA.objects.get(id=nda.id)
                 request.user.client.save()
             generic_template_handler(request, "NDA", custom_fields)
-            messages.success(request, 'Success! The NDA form has been mailed for signatures.')
+            messages.success(request, 'The NDA form has been mailed for signatures.')
         else:
             return render(request, 'partials/nda_form.html', {'nda_form': form})
     else:

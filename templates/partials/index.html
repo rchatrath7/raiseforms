@@ -28,7 +28,7 @@
                     {% if messages %}
                         <div class="alert alert-{{ message.tags }}">
                             <a class="close" data-dismiss="alert">x</a>
-                            {{ message|safe }}
+                            <strong>{{ message.tags }}</strong>{{ message|safe }}
                         </div>
                     {% endif  %}
                 {% endfor %}
