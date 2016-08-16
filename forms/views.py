@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
+from django.db import IntegrityError
+
 from django.conf import settings
 
 from django.contrib import messages
@@ -78,18 +80,23 @@ def invite_client(request):
     if request.method == 'POST':
         email = request.POST['email']
         token = os.urandom(8).encode('hex')
-        tokenized_user = AbstractUserModel(email=email, account_type='C', token=token)
-        tokenized_user.set_unusable_password()
-        tokenized_user.save()
-        auth_url = request.META['HTTP_HOST'] + '/accounts/register/' + token
-        msg = EmailMultiAlternatives(
-            subject="Please register your Raise-Forms client account!",
-            body="You have been invited to create a raise-forms account. Please click %s " \
-                 "and fill out all fields so that you can begin the on-boarding process at " \
-                 "Raise. Thanks! Note: this URL wil expire in exactly two days from now." % auth_url,
-            to=[email, request.user.email])
-        msg.send()
-        messages.success(request, 'The client has been emailed a link to register with raise-forms.')
+        try:
+            tokenized_user = AbstractUserModel(email=email, account_type='C', token=token)
+            tokenized_user.set_unusable_password()
+            tokenized_user.save()
+            auth_url = request.META['HTTP_HOST'] + '/accounts/register/' + token
+            msg = EmailMultiAlternatives(
+                subject="Please register your Raise-Forms client account!",
+                body="You have been invited to create a raise-forms account. Please click %s " \
+                     "and fill out all fields so that you can begin the on-boarding process at " \
+                     "Raise. Thanks! Note: this URL wil expire in exactly two days from now." % auth_url,
+                to=[email, request.user.email])
+            msg.send()
+            messages.success(request, 'The client has been emailed a link to register with raise-forms.')
+            return render(request, 'partials/invite-client.html')
+        except IntegrityError:
+            messages.error(request, 'This client already exists! Please add a new client.')
+            return render(request, 'partials/invite-client.html')
     else:
         return render(request, 'partials/invite-client.html')
 
@@ -140,7 +147,7 @@ def client_panel(request):
     :param request:
     :return: HTML object: user interface.
     """
-    pass
+    return render(request, 'partials/client.html')
 
 
 @login_required(login_url='/login/')
