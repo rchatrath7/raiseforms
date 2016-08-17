@@ -158,10 +158,10 @@ CLIENT_ID = "994aa15e2cd50a8d0f7eb56f229271c2"
 SITE_ID=1
 
 # MailGun config - Change once custom domain is setup - using django-anymail
-# ANYMAIL = {
-#     "MAILGUN_API_KEY": os.environ['MAILGUN_API_KEY'],
-#     "MAILGUN_SENDER_DOMAIN": os.environ['MAILGUN_DOMAIN'],
-# }
+ANYMAIL = {
+    "MAILGUN_API_KEY": os.environ['MAILGUN_API_KEY'],
+    "MAILGUN_SENDER_DOMAIN": os.environ['MAILGUN_DOMAIN'],
+}
 EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
 DEFAULT_FROM_EMAIL = "Raise Forms Mailer <admin@raiseforms.com>"
 # Try nicer looking email address.
