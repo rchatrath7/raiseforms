@@ -87,10 +87,14 @@ button {
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
-  font-weight: 500;
-  text-transform: capitalize;
+  font-weight: 600;
   letter-spacing: 1px;
   text-align: center;
+}
+
+/* line 76, ../sass/_forms.scss */
+.btn.sharp:hover {
+  color: #B12E55;
 }
 
 /* line 17, ../sass/style.scss */
@@ -395,7 +399,6 @@ td .loading-spinner.inline {
 
 /* line 250, ../sass/style.scss */
 .centered-container {
-  position: absolute;
   top: 0;
   left: 0;
   height: 100%;
@@ -404,14 +407,14 @@ td .loading-spinner.inline {
   display: table;
 }
 
-/* line 260, ../sass/style.scss */
+/* line 259, ../sass/style.scss */
 .centered {
   display: table-cell;
   vertical-align: middle;
   text-align: center;
 }
 
-/* line 266, ../sass/style.scss */
+/* line 265, ../sass/style.scss */
 .floating-login-box {
   max-width: 600px;
   border: 3px solid #4ED1AA;
@@ -423,12 +426,12 @@ td .loading-spinner.inline {
   padding-right: 15px;
   padding-bottom: 5px;
 }
-/* line 274, ../sass/style.scss */
+/* line 273, ../sass/style.scss */
 .floating-login-box form {
   text-align: left;
 }
 
-/* line 279, ../sass/style.scss */
+/* line 278, ../sass/style.scss */
 .floating-control-panel {
   max-width: 800px;
   margin: auto;
@@ -436,23 +439,23 @@ td .loading-spinner.inline {
   padding-right: 15px;
   padding-bottom: 5px;
 }
-/* line 285, ../sass/style.scss */
+/* line 284, ../sass/style.scss */
 .floating-control-panel form {
   text-align: left;
 }
 
-/* line 290, ../sass/style.scss */
+/* line 289, ../sass/style.scss */
 .search {
   position: relative;
 }
 
-/* line 291, ../sass/style.scss */
+/* line 290, ../sass/style.scss */
 .search input[type="text"] {
   height: 50px;
   text-indent: 35px;
 }
 
-/* line 296, ../sass/style.scss */
+/* line 295, ../sass/style.scss */
 .search input[type="submit"] {
   height: 50px;
   background-color: #4ED1AA;
@@ -463,7 +466,7 @@ td .loading-spinner.inline {
   border-radius: 0;
 }
 
-/* line 306, ../sass/style.scss */
+/* line 305, ../sass/style.scss */
 .search .fa-search {
   color: whitesmoke;
   position: absolute;
@@ -472,13 +475,13 @@ td .loading-spinner.inline {
   font-size: 20px;
 }
 
-/* line 314, ../sass/style.scss */
+/* line 313, ../sass/style.scss */
 .search .fa-search:hover {
   color: #555;
   cursor: pointer;
 }
 
-/* line 319, ../sass/style.scss */
+/* line 318, ../sass/style.scss */
 .navigation-bar {
   position: fixed;
   top: 0;
@@ -488,18 +491,18 @@ td .loading-spinner.inline {
   border-bottom: 3px solid #4ED1AA;
   font-weight: bold;
 }
-/* line 328, ../sass/style.scss */
+/* line 327, ../sass/style.scss */
 .navigation-bar ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
 }
-/* line 335, ../sass/style.scss */
+/* line 334, ../sass/style.scss */
 .navigation-bar li {
   float: left;
 }
-/* line 339, ../sass/style.scss */
+/* line 338, ../sass/style.scss */
 .navigation-bar li a {
   display: block;
   color: #4ED1AA;
@@ -507,19 +510,13 @@ td .loading-spinner.inline {
   padding: 14px 16px;
   text-decoration: none;
 }
-/* line 347, ../sass/style.scss */
+/* line 346, ../sass/style.scss */
 .navigation-bar li a:hover:not(.active) {
   background-color: #b3ebdb;
   color: white;
 }
-/* line 352, ../sass/style.scss */
+/* line 351, ../sass/style.scss */
 .navigation-bar .active {
   background-color: #4ED1AA;
   color: whitesmoke;
-}
-
-/* line 358, ../sass/style.scss */
-.edit-button {
-  cursor: pointer;
-  color: #333;
 }

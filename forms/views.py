@@ -138,7 +138,7 @@ def register(request, auth_token):
 
 @login_required(login_url='/login/')
 @user_passes_test(user_is_executive)
-def client_panel(request):
+def client_panel(request, user_id):
     """
     This handles the commands for interfacing with a specific user. If we don't have the basic information of the user,
     then the only option available should be to send a user the form to gather essential information. However, if the
@@ -147,7 +147,8 @@ def client_panel(request):
     :param request:
     :return: HTML object: user interface.
     """
-    return render(request, 'partials/client.html')
+    user = get_object_or_404(AbstractUserModel, id=user_id)
+    return render(request, 'partials/client.html', {'user': user})
 
 
 @login_required(login_url='/login/')

@@ -248,7 +248,6 @@ td .loading-spinner.inline {
 }
 
 .centered-container {
-  position: absolute;
   top: 0;
   left: 0;
   height: 100%;
@@ -355,7 +354,7 @@ td .loading-spinner.inline {
   }
 }
 
-.edit-button {
-  cursor: pointer;
-  color: #333;
-}
+//.edit-button {
+//  cursor: pointer;
+//  color: $purple
+//}
