@@ -190,7 +190,7 @@ def nda(request, user_id):
                     executive=request.user.executive
                 )
                 nda.save()
-                client = Client.objects.get(id=user_id)
+                client = AbstractUserModel.objects.get(id=user_id)
                 client.nda = NDA.objects.get(id=nda.id)
                 client.save()
             elif request.user.account_type == 'C':

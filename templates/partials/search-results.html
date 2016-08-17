@@ -1,6 +1,6 @@
 {% extends 'partials/index.html' %}
 {% block content %}
     {% for email in emails %}
-        {{ email }}
+        <a href="/clients/{{ email.id }}">{{ email }}</a>
     {% endfor %}
 {% endblock content %}
