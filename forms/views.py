@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
 from django.db import IntegrityError
+from django.db.models import ObjectDoesNotExist
 
 from django.conf import settings
 
@@ -71,9 +72,16 @@ def home(request):
 @user_passes_test(user_is_executive)
 def search(request):
     if request.method == 'POST':
-        email = request.POST['email']
-        emails = AbstractUserModel.objects.get(email=email)
-        return render(request, 'partials/search-results.html', {'emails': [emails]})
+        if request.POST['email'] == '':
+            clients = AbstractUserModel.objects.all(account_type='C')
+        else:
+            email = request.POST['email']
+            try:
+                clients = AbstractUserModel.objects.get(email=email)
+            except ObjectDoesNotExist:
+                messages.error(request, "We couldn't find the client you searched for!")
+                return render(request, 'partials/home.html')
+        return render(request, 'partials/search-results.html', {'clients': [clients]})
 
 
 @login_required(login_url='/login/')
@@ -125,7 +133,7 @@ def register(request, auth_token):
                 return render(request, 'partials/register-form.html', {'form': form})
             messages.success(request, "You have successfully registered with raise-forms! Please wait for your "
                                       "Raise executive to send you the required forms.")
-            return render(request, 'partials/register-form.html')
+            return redirect('/')
         else:
             form = ClientForm(initial={'email': token.email})
             return render(request, 'partials/register-form.html', {'form': form})
@@ -150,7 +158,7 @@ def client_panel(request, user_id):
     :return: HTML object: user interface.
     """
     user = get_object_or_404(AbstractUserModel, id=user_id)
-    return render(request, 'partials/client.html', {'user': client})
+    return render(request, 'partials/client.html', {'client': user})
 
 
 @login_required(login_url='/login/')

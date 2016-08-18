@@ -63,6 +63,11 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     is_admin.help_text = "All Executives are considered Admins, but Clients are not."
     is_admin.disabled = True
 
+    _is_active = models.BooleanField(default=account_type == 'E', verbose_name='Active')
+    _is_active.help_text = "All Executives are active upon creation. Clients must fill out the register form before " \
+                           "their account becomes activated."
+    _is_active.disabled = True
+
     token = models.CharField(max_length=16, null=True)
 
     objects = AbstractUserManager()
@@ -80,11 +85,11 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
 
     @property
     def is_active(self):
-        return self.account_type == 'E'
+        return self._is_active
 
     @is_active.setter
     def is_active(self, value):
-        self.is_active = value
+        self._is_active = value
 
     @property
     def is_staff(self):
@@ -236,6 +241,44 @@ class Client(models.Model):
     statement_of_work = models.ForeignKey(StatementOfWork, null=True)
     consulting_agreement = models.ForeignKey(ConsultingAgreement, null=True)
     # Purchase Request ForeignKey
+
+    # Properties
+    @property
+    def nda_status(self):
+        if self.nda and self.nda_file:
+            return "completed"
+        elif self.nda and not self.nda_file:
+            return "pending"
+        else:
+            return "incomplete"
+
+    # @property
+    # def nda_status(self):
+    #     if self.nda and self.nda_file:
+    #         return "Completed"
+    #     elif self.nda and not self.nda_file:
+    #         return "Pending"
+    #     else:
+    #         return "Incomplete"
+
+    @property
+    def statement_of_work_status(self):
+        if self.statement_of_work and self.statement_of_work_file:
+            return "completed"
+        elif self.statement_of_work and not self.statement_of_work_file:
+            return "pending"
+        else:
+            return "incomplete"
+
+    @property
+    def consulting_agreement_status(self):
+        if self.consulting_agreement and self.consulting_agreement_file:
+            return "completed"
+        elif self.consulting_agreement and not self.consulting_agreement_file:
+            return "pending"
+        else:
+            return "incomplete"
+
 
 
 @receiver(post_save, sender=AbstractUserModel)
