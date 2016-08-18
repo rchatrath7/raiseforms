@@ -43,8 +43,10 @@ def login_handler(request):
                 return redirect(request.GET['next'])
             else:
                 messages.error(request, 'Invalid User! This user has an inactive account, please renew their account.')
+                return render(request, 'partials/login.html')
         else:
             messages.error(request, 'Invalid credentials! Either your username or password were not valid.')
+            return render(request, 'partials/login.html')
     else:
         return render(request, 'partials/login.html')
 
@@ -148,7 +150,7 @@ def client_panel(request, user_id):
     :return: HTML object: user interface.
     """
     user = get_object_or_404(AbstractUserModel, id=user_id)
-    return render(request, 'partials/client.html', {'user': user})
+    return render(request, 'partials/client.html', {'user': client})
 
 
 @login_required(login_url='/login/')

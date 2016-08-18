@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 import sys
 import dj_database_url
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -81,6 +82,10 @@ WSGI_APPLICATION = 'raiseforms.wsgi.application'
 # Authentication
 AUTH_USER_MODEL = 'forms.AbstractUserModel'
 
+# Tags
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
+}
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
