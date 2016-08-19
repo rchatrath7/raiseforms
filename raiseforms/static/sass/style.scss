@@ -4,6 +4,9 @@
 $green: #4ED1AA;
 $purple: #B12E55;
 $grey: #B4B4B4;
+$complete: #04eb7b;
+$pending: #f5f53f;
+$incomplete: #ff3a3c;
 
 $navbar-height: 65px;
 $navbar-padding: 15px;
@@ -354,7 +357,43 @@ td .loading-spinner.inline {
   }
 }
 
-//.edit-button {
-//  cursor: pointer;
-//  color: $purple
-//}
+.edit-button {
+  cursor: pointer;
+  color: $green;
+}
+
+.edit-button:hover {
+  color: $purple;
+}
+
+.complete {
+  color: $complete;
+}
+
+.pending {
+  color: $pending;
+}
+
+.incomplete {
+  color: $incomplete;
+}
+
+.client-info {
+  margin-top: 20px;
+  margin-left: 50px;
+  margin-right: 187px;
+  fieldset {
+    border: solid 1px #dddddd;
+    padding: 1.25rem;
+    margin: 1.125rem 0;
+    text-align: left;
+    legend {
+      width: inherit;
+      background: white;
+      padding: 0 0.1875rem;
+      margin: 0;
+      margin-left: -0.1875rem;
+      border-bottom: none;
+    }
+  }
+}

@@ -11,14 +11,13 @@ input {
 
 select {
   display: block;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin: auto;
   height: 2em;
   font-size: 1em;
   overflow: hidden;
   border: 1px solid #ccc;
-  @include border-radius(5px);
   padding-left: 5px;
+  padding-right: 75px;
 }
 
 button {
