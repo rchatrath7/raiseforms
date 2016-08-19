@@ -72,16 +72,20 @@ def home(request):
 @user_passes_test(user_is_executive)
 def search(request):
     if request.method == 'POST':
-        if request.POST['email'] == '':
-            clients = AbstractUserModel.objects.all(account_type='C')
+        email = request.POST['email']
+        if email == '':
+            clients = AbstractUserModel.objects.filter(account_type='C', _is_active=True)
         else:
-            email = request.POST['email']
-            try:
-                clients = AbstractUserModel.objects.get(email=email)
-            except ObjectDoesNotExist:
-                messages.error(request, "We couldn't find the client you searched for!")
-                return render(request, 'partials/home.html')
-        return render(request, 'partials/search-results.html', {'clients': [clients]})
+            clients = AbstractUserModel.objects.filter(email__contains=email)
+        if len(list(clients)) == 0:
+            messages.warning(request, "We couldn't find the %s! Try modifying your search!" % email)
+        return render(request, 'partials/search-results.html', {'clients': list(clients), 'query': email})
+    else:
+        clients = AbstractUserModel.objects.filter(account_type='C', _is_active=True)
+        if len(list(clients)) == 0:
+            messages.error(request, "We couldn't find any clients in the database. "
+                                    "Please contact the system administrator.")
+        return render(request, 'partials/search-results.html', {'clients': list(clients), 'query': 'browse'})
 
 
 @login_required(login_url='/login/')
@@ -94,6 +98,8 @@ def invite_client(request):
             tokenized_user = AbstractUserModel(email=email, account_type='C', token=token)
             tokenized_user.set_unusable_password()
             tokenized_user.save()
+            tokenized_user.client.executive_id = request.user.executive.id
+            tokenized_user.client.save()
             auth_url = request.META['HTTP_HOST'] + '/accounts/register/' + token
             msg = EmailMultiAlternatives(
                 subject="Please register your Raise-Forms client account!",
@@ -107,6 +113,9 @@ def invite_client(request):
         except IntegrityError:
             messages.error(request, 'This client already exists! Please add a new client.')
             return render(request, 'partials/invite-client.html')
+        except Exception:
+            messages.error(request, 'An unknown error occurred! Please contact the system administrator.')
+            return  render(request, 'partials/invite-client.html')
     else:
         return render(request, 'partials/invite-client.html')
 
@@ -200,9 +209,13 @@ def nda(request, user_id):
                     executive=request.user.executive
                 )
                 nda.save()
-                client = AbstractUserModel.objects.get(id=user_id)
-                client.nda = NDA.objects.get(id=nda.id)
+                client = AbstractUserModel.objects.get(id=user_id).client
+                print >> sys.stderr, client
+                print >> sys.stderr, client.nda
+                client.nda = nda
+                print >> sys.stderr, client.nda
                 client.save()
+                print >> sys.stderr, client.nda
             elif request.user.account_type == 'C':
                 # save
                 nda = NDA(
