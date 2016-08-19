@@ -7,7 +7,28 @@
             <link href="{% static 'bower_components/pure/pure-min.css' %}" rel="stylesheet" type="text/css"/>
             <link href="{% static 'bower_components/pure/grids-responsive-min.css' %}" rel="stylesheet" type="text/css"/>
             <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+            <link rel="shortcut icon" href="{% static 'img/favicons/favicon.ico' %}">
+            <link rel="icon" sizes="16x16 32x32 64x64" href="{% static 'img/favicons/favicon.ico' %}">
+            <link rel="icon" type="image/png" sizes="196x196" href="{% static 'img/favicons/favicon-192.png' %}">
+            <link rel="icon" type="image/png" sizes="160x160" href="{% static 'img/favicons/favicon-160.png' %}">
+            <link rel="icon" type="image/png" sizes="96x96" href="{% static 'img/favicons/favicon-96.png' %}">
+            <link rel="icon" type="image/png" sizes="64x64" href="{% static 'img/favicons/favicon-64.png' %}">
+            <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicons/favicon-32.png' %}">
+            <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicons/favicon-16.png' %}">
+            <link rel="apple-touch-icon" href="{% static 'img/favicons/favicon-57.png' %}">
+            <link rel="apple-touch-icon" sizes="114x114" href="{% static 'img/favicons/favicon-114.png' %}">
+            <link rel="apple-touch-icon" sizes="72x72" href="{% static 'img/favicons/favicon-72.png' %}">
+            <link rel="apple-touch-icon" sizes="144x144" href="{% static 'img/favicons/favicon-144.png' %}">
+            <link rel="apple-touch-icon" sizes="60x60" href="{% static 'img/favicons/favicon-60.png' %}">
+            <link rel="apple-touch-icon" sizes="120x120" href="{% static 'img/favicons/favicon-120.png' %}">
+            <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/favicons/favicon-76.png' %}">
+            <link rel="apple-touch-icon" sizes="152x152" href="{% static 'img/favicons/favicon-152.png' %}">
+            <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicons/favicon-180.png' %}">
+            <meta name="msapplication-TileColor" content="#FFFFFF">
+            <meta name="msapplication-TileImage" content="{% static 'img/favicons/favicon-144.png' %}">
+            <meta name="msapplication-config" content="{% static 'img/favicons/browserconfig.xml' %}">
             <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     </head>
     <body>
         {% block navigation %}
@@ -30,11 +51,16 @@
             </div>
         {% endblock navigation %}
         {% block messages %}
+            <script type="text/javascript">
+                function closeAlert() {
+                    $( '#alert' ).fadeOut();
+                }
+            </script>
             <div id="messages">
                  {% if messages %}
                     {% for message in messages %}
-                        <div{% if message.tags %} class="alert alert-{{ message.tags }} data-dismissable fade in" role="alert" {% endif %}>
-                          <a class="close" data-dismiss="alert" href="">&times;</a>
+                        <div{% if message.tags %} class="alert alert-{{ message.tags }} data-dismissable fade in" id="alert"{% endif %}>
+                          <a class="close" data-dismiss="alert" aria-label="close" onclick="closeAlert()">&times;</a>
                           <strong>{{ message.tags|capfirst }}!</strong> {{ message|safe }}
                         </div>
                     {% endfor %}

@@ -38,6 +38,7 @@ class AbstractUserManager(BaseUserManager):
 
         user.is_admin = True
         user.is_superuser = True
+        user.is_active = True
         user.save()
 
         return user
@@ -127,8 +128,8 @@ class NDA(models.Model):
     executive = models.ForeignKey(Executive)
 
     def __str__(self):
-        return "<SSN: %s, Location: %s, Corporation: %s, Title: %s, Agreement Date: %s, Client: %s, Executive: %s>"\
-            % (self.ssn, self.location, self.corporation, self.title, self.agreement_date, self.client, self.executive)
+        return "<SSN: %s, Location: %s, Corporation: %s, Title: %s, Agreement Date: %s, Executive: %s>"\
+            % (self.ssn, self.location, self.corporation, self.title, self.agreement_date, self.executive)
 
     class Meta:
         verbose_name = 'NDA'
@@ -158,7 +159,7 @@ class StatementOfWork(models.Model):
     executive = models.ForeignKey(Executive)
 
     def __str__(self):
-        return "<Statement Of Work: %s, Client: %s, Executive: %s>" % (self.id, self.client, self.executive)
+        return "<Statement Of Work: %s, Executive: %s>" % (self.id, self.executive)
 
     class Meta:
         verbose_name = 'Statement of Work'
@@ -172,8 +173,8 @@ class ConsultingAgreement(models.Model):
     executive = models.ForeignKey(Executive)
 
     def __str__(self):
-        return "<Consulting Agreement: %s, Agreement Date: %s, Client: %s, Executive: %s>"\
-               % (self.id, self.agreement_date, self.client, self.executive)
+        return "<Consulting Agreement: %s, Agreement Date: %s, Executive: %s>"\
+               % (self.id, self.agreement_date, self.executive)
 
     class Meta:
         verbose_name = 'Consulting Agreement'
