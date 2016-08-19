@@ -4,9 +4,10 @@
 $green: #4ED1AA;
 $purple: #B12E55;
 $grey: #B4B4B4;
-$complete: #04eb7b;
-$pending: #f5f53f;
-$incomplete: #ff3a3c;
+$complete: #44fa59;
+$pending: #ffc300;;
+$incomplete: #ff2523;
+$info: #0055FF;
 
 $navbar-height: 65px;
 $navbar-padding: 15px;
@@ -396,4 +397,53 @@ td .loading-spinner.inline {
       border-bottom: none;
     }
   }
+}
+
+.alert-success, .alert-info, .alert-warning, .alert-danger {
+  background-color: inherit;
+  color: inherit;
+  border: solid 1px #dddddd;
+  border-left-width: 10px;
+  max-height: 50px;
+  padding-left: 5px;
+  padding-top: 10px;
+  vertical-align: middle;
+}
+
+.alert-success {
+  border-left-color: $complete;
+}
+
+.alert-info {
+  border-left-color: $info;
+}
+
+.alert-warning {
+  border-left-color: $pending;
+}
+
+.alert-danger {
+  border-left-color: $incomplete;
+}
+
+.material-icons {
+  display: inline;
+  vertical-align: middle;
+  font-size: 30px;
+}
+
+.material-icons.success {
+  color: $complete;
+}
+
+.material-icons.info {
+  color: $info;
+}
+
+.material-icons.warning {
+  color: $pending;
+}
+
+.material-icons.danger {
+  color: $incomplete;
 }

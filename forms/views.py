@@ -210,12 +210,8 @@ def nda(request, user_id):
                 )
                 nda.save()
                 client = AbstractUserModel.objects.get(id=user_id).client
-                print >> sys.stderr, client
-                print >> sys.stderr, client.nda
                 client.nda = nda
-                print >> sys.stderr, client.nda
                 client.save()
-                print >> sys.stderr, client.nda
             elif request.user.account_type == 'C':
                 # save
                 nda = NDA(

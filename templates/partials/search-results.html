@@ -1,15 +1,18 @@
 {% extends 'partials/index.html' %}
 {% block content %}
     <script type="text/javascript">
-        function redirectToPlayer(id){
-            window.location.href = "/clients/" + id + "/contact/"
+        function redirect(url){
+            window.location.href = url;
         }
     </script>
     {% if not messages %}
-        <div class="alert" style="border:solid 1px #dddddd">
+        <div class="alert alert-info">
             <div class="pure-g">
                 <div class="pure-u-7-8">
-                     Showing results for <strong style="color:#4ED1AA">{% if query != 'browse' and query != ''%} "{{ query }}" {% else %} "all" {% endif %}</strong>
+                    <p>
+                        <i class="material-icons info">info_outline</i>
+                         Search results for <strong style="color:#4ED1AA">{% if query != 'browse' and query != ''%} "{{ query }}" {% else %} "all" {% endif %}</strong>
+                    </p>
                 </div>
 {#                <div class="pure-u-1-8">#}
 {#                    <strong>Sort By:</strong>#}
@@ -30,17 +33,17 @@
                         <div class="pure-u-1">
                             <p>{{ client.email }}{% if client.client.address %} | {{ client.client.address }}{% endif %}
                                 | {% if client.is_active %}Active {% else %}Inactive {% endif %} |
-                                <span class="fa fa-envelope-o edit-button" onclick="redirectToPlayer({{ client.id }})"></span> <a href="/clients/{{ client.id }}/contact" style="color:inherit">Email</a>
+                                <span class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"></span> <a href="/clients/{{ client.id }}/contact" style="color:inherit">Email</a>
                             </p>
                         </div>
                         <div class="pure-u-1">
-                            <span class="fa fa-file-pdf-o {{ client.client.nda_status }}"></span> NDA status: <strong class="{{ client.client.nda_status }}">{{ client.client.nda_status|capfirst }}</strong>
+                            <span class="fa fa-file-pdf-o {{ client.client.nda_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/nda')"></span> NDA status: <strong class="{{ client.client.nda_status }}">{{ client.client.nda_status|capfirst }}</strong>
                         </div>
                         <div class="pure-u-1">
-                            <span class="fa fa-file-pdf-o {{ client.client.statement_of_work_status }}"></span> Statement Of Work Status: <strong class="{{ client.client.statement_of_work_status }}">{{ client.client.statement_of_work_status|capfirst }}</strong>
+                            <span class="fa fa-file-pdf-o {{ client.client.statement_of_work_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/statement_of_work')"></span> Statement Of Work Status: <strong class="{{ client.client.statement_of_work_status }}">{{ client.client.statement_of_work_status|capfirst }}</strong>
                         </div>
                         <div class="pure-u-1">
-                            <span class="fa fa-file-pdf-o {{ client.client.consulting_agreement_status }}"></span> Consulting Agreement Status: <strong class="{{ client.client.consulting_agreement_status }}">{{ client.client.consulting_agreement_status|capfirst }}</strong>
+                            <span class="fa fa-file-pdf-o {{ client.client.consulting_agreement_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/consulting_agreement')"></span> Consulting Agreement Status: <strong class="{{ client.client.consulting_agreement_status }}">{{ client.client.consulting_agreement_status|capfirst }}</strong>
                         </div>
                     </fieldset>
                 </form>
