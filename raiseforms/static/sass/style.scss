@@ -447,3 +447,11 @@ td .loading-spinner.inline {
 .material-icons.danger {
   color: $incomplete;
 }
+
+.fa {
+  > span {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    color: #333;
+  }
+}

@@ -76,7 +76,7 @@ def search(request):
         if email == '':
             clients = AbstractUserModel.objects.filter(account_type='C', _is_active=True)
         else:
-            clients = AbstractUserModel.objects.filter(email__contains=email)
+            clients = AbstractUserModel.objects.filter(email__contains=email, account_type='C')
         if len(list(clients)) == 0:
             messages.warning(request, "We couldn't find the %s! Try modifying your search!" % email)
         return render(request, 'partials/search-results.html', {'clients': list(clients), 'query': email})

@@ -33,7 +33,7 @@
                         <div class="pure-u-1">
                             <p>{{ client.email }}{% if client.client.address %} | {{ client.client.address }}{% endif %}
                                 | {% if client.is_active %}Active {% else %}Inactive {% endif %} |
-                                <span class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"></span> <a href="/clients/{{ client.id }}/contact" style="color:inherit">Email</a>
+                                <i class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"><span> Email</span></i>
                             </p>
                         </div>
                         <div class="pure-u-1">

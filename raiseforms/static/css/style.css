@@ -625,3 +625,10 @@ td .loading-spinner.inline {
 .material-icons.danger {
   color: #ff2523;
 }
+
+/* line 452, ../sass/style.scss */
+.fa > span {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  color: #333;
+}
