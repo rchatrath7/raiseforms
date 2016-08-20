@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
 from django.db import IntegrityError
-from django.db.models import ObjectDoesNotExist
+from django.db.models import ObjectDoesNotExist, Q
 
 from django.conf import settings
 
@@ -72,14 +72,17 @@ def home(request):
 @user_passes_test(user_is_executive)
 def search(request):
     if request.method == 'POST':
-        email = request.POST['email']
-        if email == '':
+        name = request.POST['email']
+        if name == '':
             clients = AbstractUserModel.objects.filter(account_type='C', _is_active=True)
         else:
-            clients = AbstractUserModel.objects.filter(email__contains=email, account_type='C')
+            for term in name.split():
+                clients = AbstractUserModel.objects.filter(Q(first_name__contains=term) | Q(last_name__contains=term) |
+                                                           Q(email__contains=term),
+                                                           account_type='C')
         if len(list(clients)) == 0:
-            messages.warning(request, "We couldn't find the %s! Try modifying your search!" % email)
-        return render(request, 'partials/search-results.html', {'clients': list(clients), 'query': email})
+            messages.warning(request, 'We couldn\'t find anything using the search term: "%s"! Try modifying your search!' % name)
+        return render(request, 'partials/search-results.html', {'clients': list(clients), 'query': name})
     else:
         clients = AbstractUserModel.objects.filter(account_type='C', _is_active=True)
         if len(list(clients)) == 0:

@@ -33,7 +33,7 @@
                         <div class="pure-u-1">
                             <p>{{ client.email }}{% if client.client.address %} | {{ client.client.address }}{% endif %}
                                 | {% if client.is_active %}Active {% else %}Inactive {% endif %} |
-                                <i class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"><span> Email</span></i>
+                                <i class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"><span class="edit-button"> Email</span></i>
                             </p>
                         </div>
                         <div class="pure-u-1">
@@ -52,8 +52,8 @@
         {% elif query != "browse" %}
             <div class="centered-container">
                 <div class="centered">
-                    <div class="floating-control-panel">
-                        <h1>Oops! We couldn't find {{ query }}.</h1>
+                    <div class="floating-control-panel" style="max-width: 950px">
+                        <h1>Oops! We couldn't find anything using the search term: <strong style="color:#4ED1AA">"{{ query }}"</strong>.</h1>
                         <p>Please try modifying your search.</p>
                          <form name="search" class="pure-form pure-form-stacked" action="/accounts/search/" method="post">
                             <fieldset>
@@ -82,7 +82,4 @@
                 </div>
             </div>
     {% endif %}
-{#    {% for client in clients %}#}
-{#        <a href="/clients/{{ client.id }}">{{ client }}</a>#}
-{#    {% endfor %}#}
 {% endblock content %}
