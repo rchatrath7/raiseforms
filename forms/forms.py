@@ -12,6 +12,13 @@ class ClientForm(forms.Form):
     address = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
 
 
+class ContactForm(forms.Form):
+    to = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
+    cc = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}), required=False)
+    subject = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'class': 'pure-u-1'}))
+
+
 class NDAForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
     email = forms.EmailField(widget=widgets.EmailInput(attrs={'class': 'pure-u-1'}))

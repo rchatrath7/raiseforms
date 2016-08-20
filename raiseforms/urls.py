@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^accounts/register/(?P<auth_token>[\w\-]+)/$', views.register),
     url(r'^accounts/search/$', views.search),
     url(r'^clients/(?P<user_id>\d+)/$', views.client_panel),
+    url(r'^clients/(?P<user_id>\d+)/contact/$', views.contact),
     url(r'^clients/(?P<user_id>\d+)/forms/nda/$', views.nda),
     url(r'^clients/(?P<user_id>\d+)/forms/statement_of_work/$', views.statement_of_work),
     url(r'^clients/(?P<user_id>\d+)/forms/purchase_request/$', views.purchase_request)

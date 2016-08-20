@@ -171,6 +171,38 @@ def client_panel(request, user_id):
 
 
 @login_required(login_url='/login/')
+@user_passes_test(user_is_executive)
+def contact(request, user_id):
+    user = get_object_or_404(AbstractUserModel, id=user_id)
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid:
+            cd = form.cleaned_data
+            to = cd['to']
+            cc = cd['cc']
+            sender = request.user.get_full_name() + "<admin@raiseforms.com>"
+            subject = cd['subject']
+            message = cd['message']
+            msg = EmailMultiAlternatives(
+                to=[to],
+                cc=[cc],
+                from_email=sender,
+                subject=subject,
+                body=message
+            )
+            msg.send()
+            messages.success(request, "The client {}, has been emailed successfully.".format(user.get_full_name))
+            form = ContactForm()
+            return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
+        else:
+            messages.error(request, 'Please correct the errors below!')
+            return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
+    else:
+        form = ContactForm(initial={'to': user.email, 'cc': request.user.email})
+        return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
+
+
+@login_required(login_url='/login/')
 def forms(request):
     """
     We need to do a few things with this forms view. We need a generic view to handle creation of any given form,
