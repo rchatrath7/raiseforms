@@ -491,7 +491,7 @@ td .loading-spinner.inline {
 /* line 331, ../sass/style.scss */
 .navigation-bar ul {
   list-style-type: none;
-  margin: 0;
+  margin: auto;
   padding: 0;
   overflow: hidden;
 }

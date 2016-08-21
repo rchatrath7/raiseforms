@@ -36,13 +36,17 @@
             <div id="navbar">
                 <div class="navigation-bar">
                     <ul>
-                        <li><a class="active" href="/home/">Home</a></li>
-                        <form>
+                        <li><a class="active" href="/">Home</a></li>
+                        <form name="login" action="" method="post">
                             {% if user.is_authenticated %}
-                                <li style="float:right"><a href="/logout/">Logout {{ user.first_name }}</a></li>
+                                <li style="float:right"><a href="/logout/">Logout {{ user }}</a></li>
+                                {% csrf_token %}
+                                <li style="margin-left: 25%; width: 43%; font-family: 'Open Sans', sans-serif;">
+                                    <input class="pure-u-21-24" name="search" title="search" placeholder="Search for a client..." formaction="/accounts/search/" formmethod="post">
+                                    <input class="pure-u-2-24 btn btn green" style="padding: 5px" type="submit" formaction="/accounts/search/" formmethod="post" value="Search">
                                 {% else %}
                                     {% csrf_token %}
-                                    <li style="float:right"><a href="/login/">Login</a></li>
+                                    <li style="float:right"><a style="cursor: pointer" onclick="login.submit()">Login</a></li>
                                     <li style="float:right"><input class="pure-u-1" name="password" type="password" title="password" placeholder="Password"></li>
                                     <li style="float:right"><input class="pure-u-1" name="username" title="username" placeholder="Username"></li>
                             {% endif %}
