@@ -72,7 +72,7 @@ def home(request):
 @user_passes_test(user_is_executive)
 def search(request):
     if request.method == 'POST':
-        name = request.POST['email']
+        name = request.POST['search']
         if name == '':
             clients = AbstractUserModel.objects.filter(account_type='C', _is_active=True)
         else:
