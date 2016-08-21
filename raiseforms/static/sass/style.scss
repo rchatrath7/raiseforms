@@ -399,6 +399,14 @@ td .loading-spinner.inline {
   }
 }
 
+.client-info.client-panel {
+  margin: auto;
+  margin-right: 15px;
+  legend {
+    text-align: center;
+  }
+}
+
 .alert-success, .alert-info, .alert-warning, .alert-danger {
   background-color: inherit;
   color: inherit;

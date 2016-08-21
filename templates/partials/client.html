@@ -3,22 +3,32 @@
     <div class="centered-container">
         <div class="centered">
             <div class="floating-control-panel">
-                <h1>Controls for {{ client }}</h1>
+                <div class="client-info client-panel">
+                    <form>
+                        <fieldset>
+                            <legend><strong>{{ client.get_full_name }}</strong></legend>
+                            <div class="pure-u-1">
+                                <p>{{ client.email }} ({{ client.id }}){% if client.client.address %} | {{ client.client.address }}{% endif %}
+                                    | {% if client.is_active %}Active {% else %}Inactive {% endif %} |
+                                    <i class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"><span class="edit-button"> Email</span></i> |
+                                    <i class="fa fa-cog edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"><span class="edit-button"> Manage</span></i>
+                                </p>
+                            </div>
+                            <div class="pure-u-1">
+                                <span class="fa fa-file-pdf-o {{ client.client.nda_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/nda')"></span> NDA status: <strong class="{{ client.client.nda_status }}">{{ client.client.nda_status|capfirst }}</strong>
+                            </div>
+                            <div class="pure-u-1">
+                                <span class="fa fa-file-pdf-o {{ client.client.statement_of_work_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/statement_of_work')"></span> Statement Of Work Status: <strong class="{{ client.client.statement_of_work_status }}">{{ client.client.statement_of_work_status|capfirst }}</strong>
+                            </div>
+                            <div class="pure-u-1">
+                                <span class="fa fa-file-pdf-o {{ client.client.consulting_agreement_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/consulting_agreement')"></span> Consulting Agreement Status: <strong class="{{ client.client.consulting_agreement_status }}">{{ client.client.consulting_agreement_status|capfirst }}</strong>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
                 <form class="pure-form pure-form-stacked">
                     <fieldset>
                         <div class="pure-g">
-                            <div class="pure-u-1-2">
-                                <button class="btn btn sharp pure-u-23-24" formaction="email/" formmethod="get" type="submit">
-                                    <i class="fa fa-envelope" style="float: left"></i>
-                                    Email
-                                </button>
-                            </div>
-                            <div class="pure-u-1-2">
-                                <button class="btn btn sharp pure-u-23-24" formaction="manage/" formmethod="get" type="submit">
-                                    <i class="fa fa-cog" style="float: left"></i>
-                                    Manage
-                                </button>
-                            </div>
                             <div class="pure-u-1-2">
                                 <button class="btn btn sharp pure-u-23-24" formaction="forms/nda/" formmethod="get" type="submit">
                                     <i class="fa fa-file-pdf-o" style="float: left"></i>
@@ -28,7 +38,7 @@
                             <div class="pure-u-1-2">
                                 <button class="btn btn sharp pure-u-23-24" formaction="forms/statement_of_work/" formmethod="get" type="submit">
                                     <i class="fa fa-file-pdf-o" style="float: left"></i>
-                                    Create a Statement Of Work form
+                                    Create a Statement of Work form
                                 </button>
                             </div>
                             <div class="pure-u-1-2">

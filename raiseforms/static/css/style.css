@@ -568,6 +568,16 @@ td .loading-spinner.inline {
 }
 
 /* line 402, ../sass/style.scss */
+.client-info.client-panel {
+  margin: auto;
+  margin-right: 15px;
+}
+/* line 405, ../sass/style.scss */
+.client-info.client-panel legend {
+  text-align: center;
+}
+
+/* line 410, ../sass/style.scss */
 .alert-success, .alert-info, .alert-warning, .alert-danger {
   background-color: inherit;
   color: inherit;
@@ -579,54 +589,54 @@ td .loading-spinner.inline {
   vertical-align: middle;
 }
 
-/* line 413, ../sass/style.scss */
+/* line 421, ../sass/style.scss */
 .alert-success {
   border-left-color: #44fa59;
 }
 
-/* line 417, ../sass/style.scss */
+/* line 425, ../sass/style.scss */
 .alert-info {
   border-left-color: #0055FF;
 }
 
-/* line 421, ../sass/style.scss */
+/* line 429, ../sass/style.scss */
 .alert-warning {
   border-left-color: #ffc300;
 }
 
-/* line 425, ../sass/style.scss */
+/* line 433, ../sass/style.scss */
 .alert-danger {
   border-left-color: #ff2523;
 }
 
-/* line 429, ../sass/style.scss */
+/* line 437, ../sass/style.scss */
 .material-icons {
   display: inline;
   vertical-align: middle;
   font-size: 30px;
 }
 
-/* line 435, ../sass/style.scss */
+/* line 443, ../sass/style.scss */
 .material-icons.success {
   color: #44fa59;
 }
 
-/* line 439, ../sass/style.scss */
+/* line 447, ../sass/style.scss */
 .material-icons.info {
   color: #0055FF;
 }
 
-/* line 443, ../sass/style.scss */
+/* line 451, ../sass/style.scss */
 .material-icons.warning {
   color: #ffc300;
 }
 
-/* line 447, ../sass/style.scss */
+/* line 455, ../sass/style.scss */
 .material-icons.danger {
   color: #ff2523;
 }
 
-/* line 452, ../sass/style.scss */
+/* line 460, ../sass/style.scss */
 .fa > span {
   font-family: 'Open Sans', sans-serif;
   font-weight: 300;
