@@ -77,8 +77,8 @@ def search(request):
             clients = AbstractUserModel.objects.filter(account_type='C', _is_active=True)
         else:
             for term in name.split():
-                clients = AbstractUserModel.objects.filter(Q(first_name__contains=term) | Q(last_name__contains=term) |
-                                                           Q(email__contains=term),
+                clients = AbstractUserModel.objects.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) |
+                                                           Q(email__icontains=term),
                                                            account_type='C')
         if len(list(clients)) == 0:
             messages.warning(request, 'We couldn\'t find anything using the search term: "%s"! Try modifying your search!' % name)
