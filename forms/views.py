@@ -127,7 +127,7 @@ def invite_client(request):
 def register(request, auth_token):
     token = get_object_or_404(Client, token=auth_token)
     is_expired = datetime.utcnow() >= token.expired
-    if not is_expired and not token.is_active:
+    if not is_expired and not token.user.is_active:
         if request.method == 'POST':
             form = ClientForm(request.POST)
             if form.is_valid():
@@ -147,7 +147,7 @@ def register(request, auth_token):
                                       "Raise executive to send you the required forms.")
             return redirect('/')
         else:
-            form = ClientForm(initial={'email': token.email})
+            form = ClientForm(initial={'email': token.user.email})
             return render(request, 'partials/register-form.html', {'form': form})
     else:
         messages.error(request, "Sorry, this URL has expired. Please contact your Raise executive to invite you.")
