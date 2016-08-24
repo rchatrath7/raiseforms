@@ -95,14 +95,6 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         return self.is_active
 
-    @property
-    def expired(self):
-        return datetime.utcnow() + timedelta(2)
-
-    @property
-    def is_redeemable(self):
-        return self.expired < datetime.utcnow() and not self.is_active
-
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
@@ -268,6 +260,14 @@ class Client(models.Model):
             return "pending"
         else:
             return "incomplete"
+
+    @property
+    def expired(self):
+        return datetime.utcnow() + timedelta(2)
+
+    @property
+    def is_redeemable(self):
+        return self.expired < datetime.utcnow() and not self.is_active
 
     @property
     def consulting_agreement_status(self):
