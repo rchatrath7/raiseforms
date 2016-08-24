@@ -98,10 +98,10 @@ def invite_client(request):
         email = request.POST['email']
         token = os.urandom(8).encode('hex')
         try:
-            tokenized_user = AbstractUserModel(email=email, account_type='C', token=token)
+            tokenized_user = AbstractUserModel(email=email, account_type='C')
             tokenized_user.set_unusable_password()
             tokenized_user.save()
-            tokenized_user.client.executive_id = request.user.executive.id
+            tokenized_user.client.executive_id, tokenized_user.client.token = request.user.executive.id, token
             tokenized_user.client.save()
             auth_url = request.META['HTTP_HOST'] + '/accounts/register/' + token
             msg = EmailMultiAlternatives(
@@ -118,14 +118,14 @@ def invite_client(request):
             return render(request, 'partials/invite-client.html')
         except Exception:
             messages.error(request, 'An unknown error occurred! Please contact the system administrator.')
-            return  render(request, 'partials/invite-client.html')
+            return render(request, 'partials/invite-client.html')
     else:
         return render(request, 'partials/invite-client.html')
 
 
 # @user_passes_test()
 def register(request, auth_token):
-    token = get_object_or_404(AbstractUserModel, token=auth_token)
+    token = get_object_or_404(Client, token=auth_token)
     is_expired = datetime.utcnow() >= token.expired
     if not is_expired and not token.is_active:
         if request.method == 'POST':
@@ -133,14 +133,14 @@ def register(request, auth_token):
             if form.is_valid():
                 cd = form.cleaned_data
                 # temporary solution
-                token.first_name = cd['first_name']
-                token.last_name = cd['last_name']
-                token.email = cd['email']
-                token.client.address = cd['address']
-                token.set_password(cd['password'])
-                token.is_active = True
+                token.user.first_name = cd['first_name']
+                token.user.last_name = cd['last_name']
+                token.user.email = cd['email']
+                token.address = cd['address']
+                token.user.set_password(cd['password'])
+                token.user.is_active = True
+                token.user.save()
                 token.save()
-                token.client.save()
             else:
                 return render(request, 'partials/register-form.html', {'form': form})
             messages.success(request, "You have successfully registered with raise-forms! Please wait for your "
@@ -262,22 +262,61 @@ def nda(request, user_id):
             generic_template_handler(request, "NDA", custom_fields)
             messages.success(request, 'The NDA form has been mailed for signatures.')
         else:
+            return render(request, 'partials/nda_form.html', {'form': form, 'status': get_object_or_404(AbstractUserModel, id=user_id).client.nda_status,
+                                                              'document_type': 'nda', 'client': AbstractUserModel.objects.get(id=user_id).client})
+    else:
+        form = NDAForm()
+        return render(request, 'partials/nda_form.html', {'form': form, 'status': get_object_or_404(AbstractUserModel, id=user_id).client.nda_status,
+                       'document_type': 'nda', 'client': AbstractUserModel.objects.get(id=user_id)})
+
+
+@login_required(login_url='/login/')
+def statement_of_work(request, client_id):
+    if request.method == 'POST':
+        form = NDAForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            custom_fields = [
+                {'email': cd['email']},
+                {"full_name": cd['name']},
+                {"corporation": cd['corporation']},
+                {"location": cd['location']},
+                {"title": cd['title']},
+                {"exec_title": request.user.executive.title},
+                {"exec_name": request.user.get_full_name()}
+            ]
+            if request.user.account_type == 'E':
+                # create NDA relationship with client
+                nda = NDA(
+                    ssn=cd['ssn'],
+                    location=cd['location'],
+                    corporation=cd['corporation'],
+                    title=cd['title'],
+                    executive=request.user.executive
+                )
+                nda.save()
+                client = AbstractUserModel.objects.get(id=user_id).client
+                client.nda = nda
+                client.save()
+            elif request.user.account_type == 'C':
+                # save
+                nda = NDA(
+                    ssn=cd['ssn'],
+                    location=cd['location'],
+                    corporation=cd['corporation'],
+                    title=cd['title'],
+                    executive=request.user.client.executive
+                )
+                nda.save()
+                request.user.client.nda = NDA.objects.get(id=nda.id)
+                request.user.client.save()
+            generic_template_handler(request, "NDA", custom_fields)
+            messages.success(request, 'The NDA form has been mailed for signatures.')
+        else:
             return render(request, 'partials/nda_form.html', {'nda_form': form})
     else:
         form = NDAForm()
         return render(request, 'partials/nda_form.html', {'nda_form': form})
-
-
-@login_required(login_url='/login/')
-def statement_of_work(request):
-    if request.method == 'POST':
-        form = StatementOfWorkForm(request.POST)
-        if form.is_valid:
-            cd = form.cleaned_data
-    else:
-        form = StatementOfWorkForm()
-    return render(request, 'partials/user_form.html', {'form': form})
-
 
 @login_required(login_url='/login/')
 def purchase_request(request):
@@ -288,6 +327,42 @@ def purchase_request(request):
     else:
         form = PurchaseRequestForm()
     return render(request, 'partials/user_form.html', {'form': form})
+
+@login_required(login_url='/login/')
+@user_passes_test(user_is_executive)
+def send_document(request, user_id, document_type):
+    user = get_object_or_404(AbstractUserModel, id=user_id)
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid:
+            cd = form.cleaned_data
+            to = cd['to']
+            cc = cd['cc']
+            sender = request.user.get_full_name() + "<admin@raiseforms.com>"
+            subject = cd['subject']
+            message = cd['message']
+            msg = EmailMultiAlternatives(
+                to=[to],
+                cc=[cc],
+                from_email=sender,
+                subject=subject,
+                body=message
+            )
+            msg.send()
+            messages.success(request, "The client {}, has been emailed successfully.".format(user.get_full_name))
+            form = ContactForm()
+            return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
+        else:
+            messages.error(request, 'Please correct the errors below!')
+            return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
+    else:
+        form = ContactForm(initial={'to': user.email, 'cc': request.user.email,
+                                    'subject': 'Hello, {}, please fill out this {} form.'.format(user.get_full_name(), document_type.capitalize()),
+                                    'message': 'Hi, our systems indicate that we\'ve sent you an NDA form to complete, '
+                                               'but we have not received the sign document. Your Raise executive, {}, '
+                                               'has requested to remind you to please fill out this form and sign the '
+                                               'document. Thanks!'.format(request.user.get_full_name())})
+        return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
 
 
 @login_required(login_url='/login/')

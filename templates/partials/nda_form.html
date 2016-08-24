@@ -1,51 +1,110 @@
 {% extends 'partials/index.html' %}
 {% block content %}
-    {% if nda_form %}
-        {% if nda_form.errors %}
-            <P>Please correct the errors below {{ nda_form.errors|pluralize }}</P>
-        {% endif %}
-        <div class="centered-container">
-            <div class="centered">
-                <div class="floating-login-box">
-                    <h1>Please fill out this NDA form.</h1>
-                    <form class="pure-form pure-form-stacked" action="" method="post">
-                        <fieldset>
-                            <div class="pure-g">
-                                <div class="pure-u-1">
-                                    <label for="name">Full Name</label>
-                                    {{ nda_form.name }}
+    <form>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('#emailModal').modal('show');
+            });
+            function closeModal() {
+                $('#emailModal').modal('hide');
+            }
+        </script>
+        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" id="emailModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                         <a class="close" onclick="closeModal()">×</a>
+                         <h3>{{ document_type|upper }} form</h3>
+                    </div>
+                    <fieldset>
+                        <div class="modal-body">
+                            {% if status == 'incomplete' %}
+                                <p>
+                                    You've chosen to generate a <strong>{{ document_type|upper }}</strong> form for {{ client.get_full_name }}. However,
+                                    we recommend emailing them the form directly instead of creating it yourself. Click the button below to
+                                    email {{ client.name }} the <strong>{{ document_type|upper }}</strong> form so that they can enter all the
+                                    required information and start the onboarding process. Or, close this window to fill out the form yourself.
+                                </p>
+                                {% elif status == 'pending'%}
+                                    <p>
+                                        Hi, it seems that we've sent out an NDA form for signing, but have not received the document yet.
+                                        You can either click the <strong>retrieve</strong> button below to have our systems manually
+                                        get the document if it has been completed yet, or contact the client to see if they have signed
+                                        and filled out all forms. Otherwise, you can close this window and fill out a new
+                                        {{ document_type|upper }} - but please note that the old document will still be out for signing.
+                                    </p>
+                                {% else %}
+                                    <embed height="100%" width="100%"  name="plugin" src="{{ document }}"  type="application/pdf">
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            {% csrf_token %}
+                            {% if status == 'incomplete' %}
+                                <div class="pure-g">
+                                    <div class="pure-u-1">
+                                        <div class="pure-u-3-4">
+                                            <input class="pure-u-1 btn btn green" type="submit" formaction="/clients/{{ client.id }}/forms/{{ document_type }}/send" formmethod="post" value="Email">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="pure-u-1">
-                                    <label for="email">Email</label>
-                                    {{ nda_form.email }}
-                                </div>
-                                <div class="pure-u-1">
-                                    <label for="ssn">SSN</label>
-                                    {{ nda_form.ssn }}
-                                </div>
-                                <div class="pure-u-1">
-                                    <label for="corporation">Corporation</label>
-                                    {{ nda_form.corporation }}
-                                </div>
-                                <div class="pure-u-1">
-                                    <label for="location">Primary Location</label>
-                                    {{ nda_form.location }}
-                                </div>
-                                <div class="pure-u-1">
-                                    <label for="title">Title</label>
-                                    {{ nda_form.title }}
-                                </div>
-                                {% csrf_token %}
-                                <div class="pure-u-1">
-                                    <input type="submit" class="btn green pure-u-1" style="text-align:center" value="Submit"/>
-                                </div>
-                            </div>
-                        </fieldset>
-                    </form>
+                                {% elif status == 'pending' %}
+                                    <div class="pure-g">
+                                        <div class="pure-u-1">
+                                            <div class="pure-u-1-2">
+                                                <input class="pure-u-1 btn btn green" type="submit" formaction="/clients/{{ client.id }}/forms/{{ document_type }}/send/" formmethod="post" value="Retrieve Document">
+                                            </div>
+                                            <div class="pure-u-1-3">
+                                                <input class="pure-u-1 btn btn green" type="submit" formaction="/clients/{{ client.id }}/contact/" formmethod="get" value="Contact">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="pure-g">
+                                        <div class="pure-u-1">
+                                            <div class="pure-u-1">
+                                                <input name="cancel" class="pure-u-1 btn btn green" type="submit" value="Close">
+                                            </div>
+                                        </div>
+                                    </div>
+                            {% endif %}
+                        </div>
+                    </fieldset>
                 </div>
             </div>
         </div>
-        {% elif embed_url%}
-            <iframe src={{ embed_url }}></iframe>
+    </form>
+    {% if form.errors %}
+        <P>Please correct the errors below {{ form.errors|pluralize }}</P>
     {% endif %}
+    <div class="centered-container">
+        <div class="centered">
+            <div class="floating-login-box">
+                {% if document_type == 'nda' %}
+                    <h1>Please fill out this NDA form for {{ client.get_full_name }}.</h1>
+                    {% elif document_type == 'statement_of_work' %}
+                        <h1>Please fill out this Statement of Work form {{ client.get_full_name }}</h1>
+                    {% elif document_type == 'consulting_agreement' %}
+                        <h1>Please fill out this Consulting Agreement form {{ client.get_full_name }}.</h1>
+                    {% elif document_type == 'purchase_request' %}
+                        <h1>Please fill out this Purchase Request form {{ client.get_full_name }}.</h1>
+                {% endif %}
+                <form class="pure-form pure-form-stacked" action="" method="post">
+                    <fieldset>
+                        <div class="pure-g">
+                            {% for field in form %}
+                                <div class="pure-u-1">
+                                    {{ field.label }}
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                            {% csrf_token %}
+                            <div class="pure-u-1">
+                                <input type="submit" class="btn green pure-u-1" style="text-align:center" value="Submit"/>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

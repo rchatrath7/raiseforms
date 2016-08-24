@@ -29,7 +29,9 @@ class NDAForm(forms.Form):
 
 
 class StatementOfWorkForm(forms.Form):
-    desc_of_services = forms.CharField(widget=widgets.Textarea)
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
+    email = forms.EmailField(widget=widgets.EmailInput(attrs={'class': 'pure-u-1'}))
+    desc_of_services = forms.CharField(widget=widgets.Textarea(attrs={'class': 'pure-u-1'}))
     milestone_choices = (
         (False, 'No Milestones are available for this service.'),
         (True, 'The following table contains a high level description of milestone services'),

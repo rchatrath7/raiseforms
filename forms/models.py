@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 from django.db import models
+from django.http import HttpResponseBadRequest
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import raiseforms.settings as settings
-import sys
+import sys, os
 from datetime import datetime, timedelta
 
 # Create your models here.
@@ -14,7 +15,7 @@ def file_upload_path(instance, filename):
     # Upload file to MEDIA_ROOT/user.id/filename
     # Perhaps adjust for renaming the files from something less ugly to something more readable - maybe the file ID
     # We could also remove all file handling to the individual classes
-    return str(self.id) + '/' + filename
+    return str(instance.id) + '/' + filename
 
 # Abstract User and Manager models taken from https://thinkster.io/django-angularjs-tutorial
 
@@ -68,8 +69,6 @@ class AbstractUserModel(AbstractBaseUser, PermissionsMixin):
     _is_active.help_text = "All Executives are active upon creation. Clients must fill out the register form before " \
                            "their account becomes activated."
     _is_active.disabled = True
-
-    token = models.CharField(max_length=16, null=True)
 
     objects = AbstractUserManager()
 
@@ -231,16 +230,24 @@ class Client(models.Model):
     # TODO: Figure out file uploading/googledocs support.
     user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True)
     address = models.CharField(max_length=100, null=True)
+    token = models.CharField(max_length=16, null=True)
+
+    nda_token = models.CharField(max_length=16, null=True)
+    nda = models.ForeignKey(NDA, null=True)
     nda_file = models.FileField(upload_to=file_upload_path, null=True)
+
+    statement_of_work_token = models.CharField(max_length=16, null=True)
+    statement_of_work = models.ForeignKey(StatementOfWork, null=True)
     statement_of_work_file = models.FileField(upload_to=file_upload_path, null=True)
+
+    consulting_agreement_token = models.CharField(max_length=16, null=True)
+    consulting_agreement = models.ForeignKey(ConsultingAgreement, null=True)
     consulting_agreement_file = models.FileField(upload_to=file_upload_path, null=True)
     purchase_request_file = models.FileField(upload_to=file_upload_path, null=True)
 
     # Relations
     executive = models.ForeignKey(Executive, null=True)
-    nda = models.ForeignKey(NDA, null=True)
-    statement_of_work = models.ForeignKey(StatementOfWork, null=True)
-    consulting_agreement = models.ForeignKey(ConsultingAgreement, null=True)
+
     # Purchase Request ForeignKey
 
     # Properties
@@ -252,15 +259,6 @@ class Client(models.Model):
             return "pending"
         else:
             return "incomplete"
-
-    # @property
-    # def nda_status(self):
-    #     if self.nda and self.nda_file:
-    #         return "Completed"
-    #     elif self.nda and not self.nda_file:
-    #         return "Pending"
-    #     else:
-    #         return "Incomplete"
 
     @property
     def statement_of_work_status(self):
@@ -280,13 +278,21 @@ class Client(models.Model):
         else:
             return "incomplete"
 
+    def generate_token(self, document_type):
+        if document_type == 'nda':
+            nda_token = os.urandom(8).encode('hex')
+        elif document_type == 'statement_of_work':
+            statement_of_work_token = os.urandom(8).encode('hex')
+        elif document_type == 'consulting_agreement':
+            consulting_agreement_token = os.urandom(8).encode('hex')
+        else:
+            return HttpResponseBadRequest("Error! Document type not found, acceptable document types include: 'NDA', "
+                                          "'Statement of Work', and 'Consulting Agreement'.")
 
 
 @receiver(post_save, sender=AbstractUserModel)
 def abstract_user_creation(sender, instance, created, **kwargs):
     if created:
-        print >> sys.stderr, instance
-        print >> sys.stderr, instance.account_type
         if instance.account_type == 'C':
             Client.objects.create(user=instance)
         else:
