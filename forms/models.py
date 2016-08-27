@@ -15,7 +15,7 @@ def file_upload_path(instance, filename):
     # Upload file to MEDIA_ROOT/user.id/filename
     # Perhaps adjust for renaming the files from something less ugly to something more readable - maybe the file ID
     # We could also remove all file handling to the individual classes
-    return str(instance.id) + '/' + filename
+    return 'data/documents/' + filename
 
 # Abstract User and Manager models taken from https://thinkster.io/django-angularjs-tutorial
 
@@ -223,6 +223,7 @@ class Client(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True)
     address = models.CharField(max_length=100, null=True)
     token = models.CharField(max_length=16, null=True)
+    active_request_id = models.CharField(max_length=200, null=True)
 
     nda_token = models.CharField(max_length=16, null=True)
     nda = models.ForeignKey(NDA, null=True)
@@ -235,6 +236,7 @@ class Client(models.Model):
     consulting_agreement_token = models.CharField(max_length=16, null=True)
     consulting_agreement = models.ForeignKey(ConsultingAgreement, null=True)
     consulting_agreement_file = models.FileField(upload_to=file_upload_path, null=True)
+
     purchase_request_file = models.FileField(upload_to=file_upload_path, null=True)
 
     # Relations
@@ -279,15 +281,33 @@ class Client(models.Model):
             return "incomplete"
 
     def generate_token(self, document_type):
-        if document_type == 'nda':
-            nda_token = os.urandom(8).encode('hex')
-        elif document_type == 'statement_of_work':
-            statement_of_work_token = os.urandom(8).encode('hex')
-        elif document_type == 'consulting_agreement':
-            consulting_agreement_token = os.urandom(8).encode('hex')
+        tokens = {
+            'nda': ['nda_token', self.nda_token],
+            'statement_of_work': ['statement_of_work_token', self.statement_of_work_token],
+            'consulting_agreement': ['consulting_agreement_token', self.consulting_agreement_token]
+         }
+        token = tokens.get(document_type, '')
+        if token:
+            if len(token) == 16:
+                return token[1]
+            else:
+                new_token = os.urandom(8).encode('hex')
+                setattr(self, token[0], new_token)
+                return new_token
         else:
             return HttpResponseBadRequest("Error! Document type not found, acceptable document types include: 'NDA', "
                                           "'Statement of Work', and 'Consulting Agreement'.")
+        # if document_type == 'nda':
+        #     if not self.nda_token:
+        #         self.nda_token = os.urandom(8).encode('hex')
+        # elif document_type == 'statement_of_work':
+        #     if not self.statement_of_work_token:
+        #         self.statement_of_work_token = os.urandom(8).encode('hex')
+        # elif document_type == 'consulting_agreement':
+        #     consulting_agreement_token = os.urandom(8).encode('hex')
+        # else:
+        #     return HttpResponseBadRequest("Error! Document type not found, acceptable document types include: 'NDA', "
+        #                                   "'Statement of Work', and 'Consulting Agreement'.")
 
 
 @receiver(post_save, sender=AbstractUserModel)
