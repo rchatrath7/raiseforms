@@ -1,12 +1,11 @@
 from django.core.files import File
-from models import AbstractUserModel
 from hellosign_sdk import HSClient as HS
 import tempfile
 
 
-def download_documents(api_key):
+def download_documents(api_key, model):
     hsClient = HS(api_key=api_key)
-    clients = [client.client if client.is_active else None for client in AbstractUserModel.objects.filter(
+    clients = [client.client if client.is_active else None for client in model.objects.filter(
         account_type='C'
     )]
     document_types = ['nda', 'statement_of_work', 'consulting_agreement']
