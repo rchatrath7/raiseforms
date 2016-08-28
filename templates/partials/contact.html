@@ -10,6 +10,8 @@
                             <strong>{{ field.label }}</strong>
                             {{ field }}
                         {% endfor %}
+                        {% csrf_token %}
+                        <input class="btn btn green pure-u-1" type="submit" value="Send" formaction="" formmethod="post">
                     </fieldset>
                 </form>
             </div>
