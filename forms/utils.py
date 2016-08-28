@@ -27,6 +27,7 @@ def send_mail(recipients, subject, message, request, from_name='', reply_to=''):
     except Exception, e:
         raise e
 
+
 def download_documents():
     hsClient = HS(api_key=settings.HELLOSIGN_API_KEY)
     clients = [client.client if client.is_active else None for client in AbstractUserModel.objects.filter(
