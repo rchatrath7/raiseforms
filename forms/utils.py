@@ -1,35 +1,11 @@
-from django.conf import settings
 from django.core.files import File
 from models import AbstractUserModel
 from hellosign_sdk import HSClient as HS
 import tempfile
-import requests
 
 
-def send_mail(recipients, subject, message, request, from_name='', reply_to=''):
-    if isinstance(recipients, list):
-        recipients = recipients
-    else:
-        recipients = [recipients]
-    if from_name:
-        sender = "%s <%s>" % (from_name, settings.MAILGUN_EMAIL_ADDRESS)
-    else:
-        sender = "Raise Forms Mailer <%s>" % settings.MAILGUN_EMAIL_ADDRESS
-    try:
-        return requests.post(
-            settings.MAILGUN_BASE_URL,
-            auth=("api", settings.MAILGUN_API_KEY),
-            data={"from": sender,
-                  "to": recipients,
-                  "subject": subject,
-                  "text": message})
-
-    except Exception, e:
-        raise e
-
-
-def download_documents():
-    hsClient = HS(api_key=settings.HELLOSIGN_API_KEY)
+def download_documents(api_key):
+    hsClient = HS(api_key=api_key)
     clients = [client.client if client.is_active else None for client in AbstractUserModel.objects.filter(
         account_type='C'
     )]
