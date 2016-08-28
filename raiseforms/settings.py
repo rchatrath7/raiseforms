@@ -14,6 +14,8 @@ import os
 import sys
 import dj_database_url
 from django.contrib.messages import constants as messages
+from celery.schedules import crontab
+from forms.tasks import task_download_documents
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -170,3 +172,16 @@ ANYMAIL = {
 EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
 DEFAULT_FROM_EMAIL = "Raise Forms Mailer <admin@raiseforms.com>"
 # Try nicer looking email address.
+
+# CELERY STUFF
+CELERYBEAT_SCHEDULE = {
+    'download-every-15-minutes': {
+        'task': 'task_download_documents',
+        'schedule': crontab(minute='*/15'),
+    },
+}
+
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'

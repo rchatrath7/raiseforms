@@ -10,6 +10,8 @@ requires = [
     'dj-database-url',
     'requires',
     'django-anymail[mailgun]',
+    'celery',
+    'redis',
 ]
 
 setup(
