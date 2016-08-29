@@ -1,2 +1,2 @@
 web: gunicorn raiseforms.wsgi --log-file -
-worker: celery worker --app=raiseforms.celery.app -B --loglevel=DEBUG
+worker: celery worker --app=raiseforms -B --loglevel=DEBUG

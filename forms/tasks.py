@@ -1,4 +1,4 @@
-
+from __future__ import absolute_import
 from celery.utils.log import get_task_logger
 from celery.task import task
 from utils import download_documents
