@@ -7,6 +7,6 @@ logger = get_task_logger(__name__)
 
 
 @task
-def task_download_documents():
-    download_documents()
+def task_download_documents(api_key, model):
+    download_documents(api_key, model)
     logger.info("Downloaded all available documents")
