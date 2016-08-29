@@ -1,2 +1,3 @@
 web: gunicorn raiseforms.wsgi --log-file -
-worker: python manage.py celery worker -B -l info
+worker: celery worker -app=raiseforms.celery.app --loglevel=INFO
+beat: celery --app=raiseforms.celery.app
