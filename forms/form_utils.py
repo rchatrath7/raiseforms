@@ -45,3 +45,5 @@ def download_documents(api_key):
                         logger.error("Error downloading document: <%s, %s>" % (document, status))
                     document.close()
                     logger.info("Closed document.")
+                else:
+                    logger.info("Request is incomplete!")

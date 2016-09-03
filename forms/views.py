@@ -318,14 +318,15 @@ def nda(request, user_id):
             messages.success(request,
                              'The NDA form has been mailed for signatures. You can check it\'s status at {}.'.format(
                 signature_request.details_url))
-            return render(request, 'partials/nda_form.html', {'nda_form': form})
+            return render(request, 'partials/nda_form.html', {'nda_form': NDAForm()})
         else:
             return render(request, 'partials/nda_form.html', {'form': form, 'status': client.nda_status,
-                                                              'document_type': 'nda', 'client': client})
+                                                              'document_type': 'nda', 'client': client, 'document':
+                                                              client.nda_file})
     else:
         form = NDAForm()
         return render(request, 'partials/nda_form.html', {'form': form, 'status': client.nda_status,
-                       'document_type': 'nda', 'client': client})
+                       'document_type': 'nda', 'client': client, 'document': client.nda_file})
 
 
 @login_required(login_url='/login/')
