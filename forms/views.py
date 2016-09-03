@@ -292,18 +292,27 @@ def nda(request, user_id):
                         if field not in ['email', 'full_name']:
                             setattr(client.nda, field, value)
                     client.nda.save()
+                if client.nda_file:
+                    client.nda_file = None
                 client.save()
             elif request.user.account_type == 'C':
                 # save
-                nda = NDA(
-                    ssn=cd['ssn'],
-                    location=cd['location'],
-                    corporation=cd['corporation'],
-                    title=cd['title'],
-                    executive=request.user.client.executive
-                )
-                nda.save()
-                client.nda = NDA.objects.get(id=nda.id)
+                if not client.nda:
+                    nda = NDA(
+                        ssn=cd['ssn'],
+                        location=cd['location'],
+                        corporation=cd['corporation'],
+                        title=cd['title'],
+                        executive=request.user.client.executive
+                    )
+                    nda.save()
+                    client.nda = nda
+                else:
+                    for field, value in cd.iteritems():
+                        if field not in ['email', 'full_name']:
+                            setattr(client.nda, field, value)
+                if client.nda_file:
+                    client.nda_file = None
                 client.save()
             signature_request = generic_template_handler(request, "NDA", custom_fields)
             messages.success(request,
