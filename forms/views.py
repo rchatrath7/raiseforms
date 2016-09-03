@@ -325,11 +325,11 @@ def nda(request, user_id):
     else:
         form = NDAForm()
         if client.nda_file:
-            file = client.nda_file.open(mode='r').read()
+            file = client.nda_file.read()
         else:
             file = None
         return render(request, 'partials/nda_form.html', {'form': form, 'status': client.nda_status,
-                       'document_type': 'nda', 'client': client, 'document': file})
+                       'document_type': 'nda', 'client': client, 'document': client.nda_file})
 
 
 @login_required(login_url='/login/')
@@ -449,7 +449,7 @@ def retrieve(request, user_id, document_type):
         messages.warning(request, 'The file is still being prepared. Please wait for the document to be completed.')
     else:
         doc_file = getattr(user, '{}_file'.format(document_type))
-        doc_file.save('{}/{}/{}'.format(user.user.get_full_name(), document_type, getattr(user, '{}_id'.format(document_type))),
+        doc_file.save('{}/{}/{}.pdf'.format(user.user.get_full_name(), document_type, getattr(user, '{}_id'.format(document_type))),
                       File(document), save=True)
         user.save()
         messages.success(request, 'We retrieved the document!')

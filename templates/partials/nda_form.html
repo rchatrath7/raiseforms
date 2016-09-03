@@ -34,7 +34,7 @@
                                         {{ document_type|upper }} - but please note that the old document will still be out for signing.
                                     </p>
                                 {% else %}
-                                    <embed height="100%" width="100%"  name="plugin" src="{{ document }}"  type="application/pdf">
+                                    <embed height="100%" width="100%"  name="plugin" src="{{ document.read }}"  type="application/pdf">
                             {% endif %}
                         </div>
                         <div class="modal-footer">

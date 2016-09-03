@@ -36,8 +36,8 @@ def download_documents(api_key):
                     if status:
                         logger.info("Successfully downloaded document: %s" % document)
                         doc_file = getattr(client, '{}_file'.format(document_type))
-                        doc_file.save('{}/{}/{}'.format(client.user.get_full_name(), document_type,
-                                                        getattr(client, '{}_id'.format(document_type))),
+                        doc_file.save('{}/{}/{}.pdf'.format(client.user.get_full_name(), document_type,
+                                                            getattr(client, '{}_id'.format(document_type))),
                                       File(document), save=True)
                         client.active_request_id = None
                         client.save()
