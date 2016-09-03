@@ -181,7 +181,8 @@ def contact(request, user_id):
     user = get_object_or_404(AbstractUserModel, id=user_id)
     if request.method == 'POST':
         form = ContactForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
+            print >> sys.stderr, form
             cd = form.cleaned_data
             to = cd['to']
             cc = cd['cc']
@@ -213,7 +214,7 @@ def remind_user(request, user_id, document_type):
     user = get_object_or_404(AbstractUserModel, id=user_id)
     if request.method == 'POST':
         form = ContactForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             cd = form.cleaned_data
             to = cd['to']
             cc = cd['cc']
@@ -401,7 +402,7 @@ def send_document(request, user_id, document_type):
     user = get_object_or_404(AbstractUserModel, id=user_id)
     if request.method == 'POST':
         form = ContactForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             cd = form.cleaned_data
             to = cd['to']
             cc = cd['cc']
