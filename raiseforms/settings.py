@@ -180,7 +180,7 @@ CELERYBEAT_SCHEDULE = {
     'download-every-15-minutes': {
         'task': 'task-download-documents',
         'schedule': crontab(minute='*/1'),
-        'args': (HELLOSIGN_API_KEY),
+        'args': [HELLOSIGN_API_KEY],
     },
 }
 CELERY_ACCEPT_CONTENT = ['application/json']
