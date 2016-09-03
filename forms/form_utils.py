@@ -2,11 +2,14 @@ from django.core.files import File
 from hellosign_sdk import HSClient as HS
 from celery.utils.log import get_task_logger
 import tempfile
+from django.apps import apps
 
 
 logger = get_task_logger(__name__)
 
-def download_documents(api_key, model):
+
+def download_documents(api_key):
+    model = apps.get_model(app_label='forms', model_name='AbstractUserModel')
     logger.info("Starting retrieval")
     hsClient = HS(api_key=api_key)
     clients = [client.client if client.is_active else None for client in model.objects.filter(

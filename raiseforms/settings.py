@@ -17,7 +17,7 @@ import dj_database_url
 from django.contrib.messages import constants as messages
 from celery.schedules import crontab
 from forms.tasks import task_download_documents
-from forms.models import AbstractUserModel
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -180,7 +180,7 @@ CELERYBEAT_SCHEDULE = {
     'download-every-15-minutes': {
         'task': 'task-download-documents',
         'schedule': crontab(minute='*/1'),
-        'args': (HELLOSIGN_API_KEY, AbstractUserModel),
+        'args': (HELLOSIGN_API_KEY),
     },
 }
 CELERY_ACCEPT_CONTENT = ['application/json']
