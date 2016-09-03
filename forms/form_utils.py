@@ -26,7 +26,7 @@ def download_documents(api_key):
             logger.info("Gathered signature request: %s" % request)
             if request.is_complete:
                 document = tempfile.TemporaryFile()
-                status = client.get_signature_request_file(
+                status = hsClient.get_signature_request_file(
                     signature_request_id=str(client.active_request_id),
                     path_or_file=document,
                     file_type='pdf'
