@@ -35,8 +35,8 @@ urlpatterns = [
     url(r'^clients/(?P<user_id>\d+)/forms/statement_of_work/$', views.statement_of_work),
     url(r'^clients/(?P<user_id>\d+)/forms/purchase_request/$', views.purchase_request),
     url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/remind_user/$', views.remind_user),
-    url(r'clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/send/$', views.send_document),
-    url(r'clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/retrieve/$', views.retrieve)
+    url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/send/$', views.send_document),
+    url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/retrieve/$', views.retrieve)
 ]
 
 if settings.DEBUG:

@@ -177,8 +177,8 @@ DEFAULT_FROM_EMAIL = "Raise Forms Mailer <admin@raiseforms.com>"
 # CELERY STUFF
 CELERYBEAT_SCHEDULE = {
     'download-every-15-minutes': {
-        'task': 'task_download_documents',
-        'schedule': crontab(minute='*/15'),
+        'task': 'task-download-documents',
+        'schedule': crontab(minute='*/1'),
         'args': (HELLOSIGN_API_KEY, AUTH_USER_MODEL),
     },
 }
