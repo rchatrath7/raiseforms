@@ -344,8 +344,10 @@ def statement_of_work(request, client_id):
                     executive=request.user.executive
                 )
                 nda.save()
-                client = AbstractUserModel.objects.get(id=user_id).client
+                client = AbstractUserModel.objects.get(id=client_id).client
                 client.nda = nda
+                if client.nda_file:
+                    client.nda_file = None
                 client.save()
             elif request.user.account_type == 'C':
                 # save
@@ -358,6 +360,8 @@ def statement_of_work(request, client_id):
                 )
                 nda.save()
                 request.user.client.nda = NDA.objects.get(id=nda.id)
+                if request.user.client.nda_file:
+                    request.user.client.nda_file = None
                 request.user.client.save()
             signature_request = generic_template_handler(request, "NDA", custom_fields)
             messages.success(request, 'The NDA form has been mailed for signatures. You can check it\'s status at {}.').format(signature_request.details_url)
