@@ -321,12 +321,12 @@ def nda(request, user_id):
             return render(request, 'partials/nda_form.html', {'nda_form': NDAForm()})
         else:
             return render(request, 'partials/nda_form.html', {'form': form, 'status': client.nda_status,
-                                                              'document_type': 'nda', 'client': client, 'document':
-                                                              client.nda_file.open(mode='r').read()})
+                                                              'document_type': 'nda', 'client': client})
     else:
         form = NDAForm()
         return render(request, 'partials/nda_form.html', {'form': form, 'status': client.nda_status,
-                       'document_type': 'nda', 'client': client, 'document': client.nda_file.open(mode='r').read()})
+                       'document_type': 'nda', 'client': client, 'document': client.nda_file.open(mode='r').read()
+                                                          if client.nda_file else None})
 
 
 @login_required(login_url='/login/')
