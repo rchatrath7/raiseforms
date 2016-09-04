@@ -31,7 +31,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 SECRET_KEY = 'yae54b*++rm5jq@wuo%8)owt(bunexph@&03w=242s8%k$urag'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -156,6 +156,9 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, "staticfiles")
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, "media")
 
 # Hellosign config
 HELLOSIGN_API_KEY = "1955fc7886b608d52e2351ddee5c8ac327eb8eee89c6aa6f7fc10a0ddc347210"

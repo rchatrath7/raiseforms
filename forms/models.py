@@ -15,7 +15,7 @@ def file_upload_path(instance, filename):
     # Upload file to MEDIA_ROOT/user.id/filename
     # Perhaps adjust for renaming the files from something less ugly to something more readable - maybe the file ID
     # We could also remove all file handling to the individual classes
-    return 'data/documents/' + filename
+    return 'MEDIA_ROOT/documents/' + filename
 
 # Abstract User and Manager models taken from https://thinkster.io/django-angularjs-tutorial
 

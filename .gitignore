@@ -4,4 +4,4 @@
 raiseforms.egg-info/*
 build/*
 dist/*
-data/
+media/

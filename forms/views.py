@@ -4,6 +4,7 @@ from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist, Q
 
 from django.conf import settings
+from django.http import HttpResponse
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -325,10 +326,10 @@ def nda(request, user_id):
                                                               'document_type': 'nda', 'client': client})
     else:
         form = NDAForm()
-        if client.nda_file:
-            file = client.nda_file.read()
-        else:
-            file = None
+        # if client.nda_file:
+        #     file = client.nda_file.read()
+        # else:
+        #     file = None
         return render(request, 'partials/nda_form.html', {'form': form, 'status': client.nda_status,
                        'document_type': 'nda', 'client': client, 'document': client.nda_file})
 
