@@ -129,22 +129,8 @@ MESSAGE_TAGS = {
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 
-DATABASE_URL = "mysql://bd647441445c99:384c543f@us-cdbr-iron-east-04.cleardb.net/heroku_c55f0079fb2fadf"
-
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'raiseforms',
-        'USER': 'raise',
-        'PASSWORD': 'bT7B2nZEjF6G88yR',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-
-
-DATABASES['default'] = dj_database_url.config(default=DATABASE_URL, conn_max_age=500)
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(default=get_env_variable('DATABASE_URL'), conn_max_age=500)
 
 
 # Password validation
@@ -220,8 +206,8 @@ SITE_ID=1
 
 # MailGun config - Change once custom domain is setup - using django-anymail
 ANYMAIL = {
-    "MAILGUN_API_KEY": get_env_variable('MAILGUN_API_KEY') if 'PROD_SETTING' not in os.environ else os.environ['MAILGUN_API_KEY'],
-    "MAILGUN_SENDER_DOMAIN": get_env_variable('MAILGUN_DOMAIN') if 'PROD_SETTING' not in os.environ else os.environ['MAILGUN_DOMAIN'],
+    "MAILGUN_API_KEY": get_env_variable('MAILGUN_API_KEY'),
+    "MAILGUN_SENDER_DOMAIN": get_env_variable('MAILGUN_DOMAIN'),
 }
 EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
 DEFAULT_FROM_EMAIL = "Raise Forms Mailer <admin@raiseforms.com>"

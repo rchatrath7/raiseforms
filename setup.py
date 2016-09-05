@@ -14,6 +14,7 @@ requires = [
     'redis',
     'django-storages',
     'boto'
+    'psycopg2'
 ]
 
 setup(

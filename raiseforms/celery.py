@@ -11,7 +11,7 @@ app = Celery('raiseforms')
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
 app.config_from_object('django.conf:settings')
-url = get_env_variable('REDIS_URL') if 'PROD_SETTING' not in os.environ else os.environ['REDIS_URL']
+url = get_env_variable('REDIS_URL')
 app.conf.update(BROKER_URL=url,
                 CELERY_RESULT_BACKEND=url)
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
