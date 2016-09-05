@@ -109,7 +109,7 @@ class Executive(models.Model):
 class NDA(models.Model):
     # TODO: Put in validators
     # NDA FORM
-    ssn = models.CharField(max_length=9)
+    ssn = models.CharField(max_length=11)
     location = models.CharField(max_length=100)
     corporation = models.CharField(max_length=100)
     title = models.CharField(max_length=20)
