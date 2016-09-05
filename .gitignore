@@ -5,3 +5,4 @@ raiseforms.egg-info/*
 build/*
 dist/*
 media/
+raiseforms/.env

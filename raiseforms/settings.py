@@ -31,9 +31,42 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 SECRET_KEY = 'yae54b*++rm5jq@wuo%8)owt(bunexph@&03w=242s8%k$urag'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
+
+def get_env_variable(var_name, default=False):
+    """
+    Get the environment variable or return exception
+    :param var_name: Environment Variable to lookup
+    """
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        import StringIO
+        import ConfigParser
+        env_file = os.path.join(PROJECT_ROOT, ".env")
+        try:
+            config = StringIO.StringIO()
+            config.write("[DATA]\n")
+            config.write(open(env_file).read())
+            config.seek(0, os.SEEK_SET)
+            cp = ConfigParser.ConfigParser()
+            cp.readfp(config)
+            value = dict(cp.items('DATA'))[var_name.lower()]
+            if value.startswith('"') and value.endswith('"'):
+                value = value[1:-1]
+            elif value.startswith("'") and value.endswith("'"):
+                value = value[1:-1]
+            os.environ.setdefault(var_name, value)
+            return value
+        except (KeyError, IOError):
+            if default is not False:
+                return default
+            from django.core.exceptions import ImproperlyConfigured
+            error_msg = "Either set the env variable '{var}' or place it in your " \
+                        "{env_file} file as '{var} = VALUE'"
+            raise ImproperlyConfigured(error_msg.format(var=var_name, env_file=env_file))
 
 
 # Application definition
@@ -48,6 +81,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'forms',
     'anymail',
+    'storages',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -148,8 +182,20 @@ USE_TZ = True
 
 # static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
+AWS_HEADERS = {  # see http://developer.yahoo.com/performance/rules.html#expires
+        'Expires': 'Thu, 31 Dec 2099 20:00:00 GMT',
+        'Cache-Control': 'max-age=94608000',
+    }
 
-STATIC_URL = '/static/'
+AWS_STORAGE_BUCKET_NAME = 'raiseforms'
+AWS_ACCESS_KEY_ID = 'AKIAIARXBFALKLDEJ6WQ'
+AWS_SECRET_ACCESS_KEY = '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'
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+STATICFILES_LOCATION = 'static'
+STATICFILES_STORAGE = 'raiseforms.custom_storages.StaticStorage'
+STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
 
 STATICFILES_DIRS = [
     os.path.join(PROJECT_ROOT, "static")
@@ -157,7 +203,10 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, "staticfiles")
 
-MEDIA_URL = '/media/'
+MEDIAFILES_LOCATION = 'media'
+MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+DEFAULT_FILE_STORAGE = 'custom_storages.MediaStorage'
+
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, "media")
 
 # Hellosign config
@@ -171,8 +220,8 @@ SITE_ID=1
 
 # MailGun config - Change once custom domain is setup - using django-anymail
 ANYMAIL = {
-    "MAILGUN_API_KEY": os.environ['MAILGUN_API_KEY'],
-    "MAILGUN_SENDER_DOMAIN": os.environ['MAILGUN_DOMAIN'],
+    "MAILGUN_API_KEY": get_env_variable('MAILGUN_API_KEY') if 'PROD_SETTING' not in os.environ else os.environ['MAILGUN_API_KEY'],
+    "MAILGUN_SENDER_DOMAIN": get_env_variable('MAILGUN_DOMAIN') if 'PROD_SETTING' not in os.environ else os.environ['MAILGUN_DOMAIN'],
 }
 EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
 DEFAULT_FROM_EMAIL = "Raise Forms Mailer <admin@raiseforms.com>"

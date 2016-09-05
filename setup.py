@@ -12,6 +12,8 @@ requires = [
     'django-anymail[mailgun]',
     'celery',
     'redis',
+    'django-storages',
+    'boto'
 ]
 
 setup(
