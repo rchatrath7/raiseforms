@@ -22,7 +22,7 @@
                                 <p>
                                     You've chosen to generate a <strong>{{ document_type|upper }}</strong> form for {{ client.user.get_full_name }}. However,
                                     we recommend emailing them the form directly instead of creating it yourself. Click the button below to
-                                    email {{ client.name }} the <strong>{{ document_type|upper }}</strong> form so that they can enter all the
+                                    email {{ client.user.first_name }} the <strong>{{ document_type|upper }}</strong> form so that they can enter all the
                                     required information and start the onboarding process. Or, close this window to fill out the form yourself.
                                 </p>
                                 {% elif status == 'pending'%}
@@ -78,13 +78,13 @@
         <div class="centered">
             <div class="floating-login-box">
                 {% if document_type == 'nda' %}
-                    <h1>Please fill out this NDA form for {{ client.get_full_name }}.</h1>
+                    <h1>Please fill out this NDA form for {{ client.user.get_full_name }}.</h1>
                     {% elif document_type == 'statement_of_work' %}
-                        <h1>Please fill out this Statement of Work form {{ client.get_full_name }}</h1>
+                        <h1>Please fill out this Statement of Work form {{ client.user.get_full_name }}</h1>
                     {% elif document_type == 'consulting_agreement' %}
-                        <h1>Please fill out this Consulting Agreement form {{ client.get_full_name }}.</h1>
+                        <h1>Please fill out this Consulting Agreement form {{ client.user.get_full_name }}.</h1>
                     {% elif document_type == 'purchase_request' %}
-                        <h1>Please fill out this Purchase Request form {{ client.get_full_name }}.</h1>
+                        <h1>Please fill out this Purchase Request form {{ client.user.get_full_name }}.</h1>
                 {% endif %}
                 <form class="pure-form pure-form-stacked" action="" method="post">
                     <fieldset>

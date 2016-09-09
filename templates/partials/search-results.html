@@ -26,24 +26,24 @@
             </div>
         </div>
         <div class="client-info">
-            {% for client in clients|dictsort:'first_name' %}
+            {% for client in clients|dictsort:'user.first_name' %}
                 <form>
                     <fieldset>
-                        <legend><a href="/clients/{{ client.id }}">{{ client.get_full_name }}</a></legend>
+                        <legend><a href="/clients/{{ client.user_id }}">{{ client.user.get_full_name }}</a></legend>
                         <div class="pure-u-1">
-                            <p>{{ client.email }}{% if client.client.address %} | {{ client.client.address }}{% endif %}
-                                | {% if client.is_active %}Active {% else %}Inactive {% endif %} |
-                                <i class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"><span class="edit-button"> Email</span></i>
+                            <p>{{ client.user.email }}{% if client.address %} | {{ client.address }}{% endif %}
+                                | {% if client.user.is_active %}Active {% else %}Inactive {% endif %} |
+                                <i class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.user_id }}/contact')"><span class="edit-button"> Email</span></i>
                             </p>
                         </div>
                         <div class="pure-u-1">
-                            <span class="fa fa-file-pdf-o {{ client.client.nda_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/nda')"></span> NDA status: <strong class="{{ client.client.nda_status }}">{{ client.client.nda_status|capfirst }}</strong>
+                            <span class="fa fa-file-pdf-o {{ client.nda_status }} edit-button" onclick="redirect('/clients/{{ client.user_id }}/forms/nda')"></span> NDA status: <strong class="{{ client.nda_status }}">{{ client.nda_status|capfirst }}</strong>
                         </div>
                         <div class="pure-u-1">
-                            <span class="fa fa-file-pdf-o {{ client.client.statement_of_work_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/statement_of_work')"></span> Statement Of Work Status: <strong class="{{ client.client.statement_of_work_status }}">{{ client.client.statement_of_work_status|capfirst }}</strong>
+                            <span class="fa fa-file-pdf-o {{ client.statement_of_work_status }} edit-button" onclick="redirect('/clients/{{ client.user_id }}/forms/statement_of_work')"></span> Statement Of Work Status: <strong class="{{ client.statement_of_work_status }}">{{ client.statement_of_work_status|capfirst }}</strong>
                         </div>
                         <div class="pure-u-1">
-                            <span class="fa fa-file-pdf-o {{ client.client.consulting_agreement_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/consulting_agreement')"></span> Consulting Agreement Status: <strong class="{{ client.client.consulting_agreement_status }}">{{ client.client.consulting_agreement_status|capfirst }}</strong>
+                            <span class="fa fa-file-pdf-o {{ client.client.consulting_agreement_status }} edit-button" onclick="redirect('/clients/{{ client.user_id }}/forms/consulting_agreement')"></span> Consulting Agreement Status: <strong class="{{ client.consulting_agreement_status }}">{{ client.consulting_agreement_status|capfirst }}</strong>
                         </div>
                     </fieldset>
                 </form>
@@ -61,7 +61,7 @@
                                      <div class="pure-u-1">
                                          <div class="search">
                                              <span class="fa fa-search" onclick="search.submit()"></span>
-                                             <input type="text" class="pure-u-1" name="email" placeholder="Search for a client...">
+                                             <input type="text" class="pure-u-1" name="search" placeholder="Search for a client...">
                                              {% csrf_token %}
                                              <input type="submit" value="">
                                          </div>

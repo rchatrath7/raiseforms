@@ -1,27 +1,32 @@
 {% extends "partials/index.html" %}
 {% block content %}
+     <script type="text/javascript">
+        function redirect(url){
+            window.location.href = url;
+        }
+    </script>
     <div class="centered-container">
         <div class="centered">
             <div class="floating-control-panel">
                 <div class="client-info client-panel">
                     <form>
                         <fieldset>
-                            <legend><strong>{{ client.get_full_name }}</strong></legend>
+                            <legend><strong>{{ client.user.get_full_name }}</strong></legend>
                             <div class="pure-u-1">
-                                <p>{{ client.email }} ({{ client.id }}){% if client.client.address %} | {{ client.client.address }}{% endif %}
-                                    | {% if client.is_active %}Active {% else %}Inactive {% endif %} |
-                                    <i class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"><span class="edit-button"> Email</span></i> |
-                                    <i class="fa fa-cog edit-button" onclick="redirect('/clients/{{ client.id }}/contact')"><span class="edit-button"> Manage</span></i>
+                                <p>{{ client.user.email }} ({{ client.user_id }}){% if client.address %} | {{ client.address }}{% endif %}
+                                    | {% if client.user.is_active %}Active {% else %}Inactive {% endif %} |
+                                    <i class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.user_id }}/contact')"><span class="edit-button"> Email</span></i> |
+                                    <i class="fa fa-cog edit-button" onclick="redirect('/clients/{{ client.user_id }}/contact')"><span class="edit-button"> Manage</span></i>
                                 </p>
                             </div>
                             <div class="pure-u-1">
-                                <span class="fa fa-file-pdf-o {{ client.client.nda_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/nda')"></span> NDA status: <strong class="{{ client.client.nda_status }}">{{ client.client.nda_status|capfirst }}</strong>
+                                <span class="fa fa-file-pdf-o {{ client.nda_status }} edit-button" onclick="redirect('/clients/{{ client.user_id }}/forms/nda')"></span> NDA status: <strong class="{{ client.nda_status }}">{{ client.nda_status|capfirst }}</strong>
                             </div>
                             <div class="pure-u-1">
-                                <span class="fa fa-file-pdf-o {{ client.client.statement_of_work_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/statement_of_work')"></span> Statement Of Work Status: <strong class="{{ client.client.statement_of_work_status }}">{{ client.client.statement_of_work_status|capfirst }}</strong>
+                                <span class="fa fa-file-pdf-o {{ client.statement_of_work_status }} edit-button" onclick="redirect('/clients/{{ client.user_id }}/forms/statement_of_work')"></span> Statement Of Work Status: <strong class="{{ client.statement_of_work_status }}">{{ client.statement_of_work_status|capfirst }}</strong>
                             </div>
                             <div class="pure-u-1">
-                                <span class="fa fa-file-pdf-o {{ client.client.consulting_agreement_status }} edit-button" onclick="redirect('/clients/{{ client.id }}/forms/consulting_agreement')"></span> Consulting Agreement Status: <strong class="{{ client.client.consulting_agreement_status }}">{{ client.client.consulting_agreement_status|capfirst }}</strong>
+                                <span class="fa fa-file-pdf-o {{ client.consulting_agreement_status }} edit-button" onclick="redirect('/clients/{{ client.user_id }}/forms/consulting_agreement')"></span> Consulting Agreement Status: <strong class="{{ client.consulting_agreement_status }}">{{ client.consulting_agreement_status|capfirst }}</strong>
                             </div>
                         </fieldset>
                     </form>

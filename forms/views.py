@@ -85,15 +85,18 @@ def search(request):
                 clients = AbstractUserModel.objects.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) |
                                                            Q(email__icontains=term),
                                                            account_type='C')
-        if len(list(clients)) == 0:
+        client_list = [client.client for client in clients]
+        print >> sys.stderr, client_list
+        if len(client_list) == 0:
             messages.warning(request, 'We couldn\'t find anything using the search term: "%s"! Try modifying your search!' % name)
-        return render(request, 'partials/search-results.html', {'clients': [client.client for client in clients], 'query': name})
+        return render(request, 'partials/search-results.html', {'clients': client_list, 'query': name})
     else:
         clients = AbstractUserModel.objects.filter(account_type='C', _is_active=True)
-        if len(list(clients)) == 0:
+        client_list = [client.client for client in clients]
+        if len(client_list) == 0:
             messages.error(request, "We couldn't find any clients in the database. "
                                     "Please contact the system administrator.")
-        return render(request, 'partials/search-results.html', {'clients': [client.client for client in clients], 'query': 'browse'})
+        return render(request, 'partials/search-results.html', {'clients': client_list, 'query': 'browse'})
 
 
 @login_required(login_url='/login/')

@@ -4,7 +4,7 @@
         <div class="centered">
             <div class="floating-control-panel">
                 <form>
-                <h1>Contact {{ client.get_full_name }} ({{ client.email }})</h1>
+                <h1>Contact {{ client.user.get_full_name }} ({{ client.user.email }})</h1>
                     <fieldset>
                         {% for field in form %}
                             <strong>{{ field.label }}</strong>
