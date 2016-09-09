@@ -87,13 +87,13 @@ def search(request):
                                                            account_type='C')
         if len(list(clients)) == 0:
             messages.warning(request, 'We couldn\'t find anything using the search term: "%s"! Try modifying your search!' % name)
-        return render(request, 'partials/search-results.html', {'clients': list(clients), 'query': name})
+        return render(request, 'partials/search-results.html', {'clients': [client.client for client in clients], 'query': name})
     else:
         clients = AbstractUserModel.objects.filter(account_type='C', _is_active=True)
         if len(list(clients)) == 0:
             messages.error(request, "We couldn't find any clients in the database. "
                                     "Please contact the system administrator.")
-        return render(request, 'partials/search-results.html', {'clients': list(clients), 'query': 'browse'})
+        return render(request, 'partials/search-results.html', {'clients': [client.client for client in clients], 'query': 'browse'})
 
 
 @login_required(login_url='/login/')
@@ -174,18 +174,17 @@ def client_panel(request, user_id):
     :param request:
     :return: HTML object: user interface.
     """
-    user = get_object_or_404(AbstractUserModel, id=user_id)
+    user = get_object_or_404(Client, user_id=user_id)
     return render(request, 'partials/client.html', {'client': user})
 
 
 @login_required(login_url='/login/')
 @user_passes_test(user_is_executive)
 def contact(request, user_id):
-    user = get_object_or_404(AbstractUserModel, id=user_id)
+    user = get_object_or_404(Client, user_id=user_id)
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            print >> sys.stderr, form
             cd = form.cleaned_data
             to = cd['to']
             cc = cd['cc']
@@ -200,21 +199,21 @@ def contact(request, user_id):
                 body=message
             )
             msg.send()
-            messages.success(request, "The client {}, has been emailed successfully.".format(user.get_full_name))
+            messages.success(request, "The client {}, has been emailed successfully.".format(user.user.get_full_name()))
             form = ContactForm()
             return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
         else:
             messages.error(request, 'Please correct the errors below!')
             return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
     else:
-        form = ContactForm(initial={'to': user.email, 'cc': request.user.email})
+        form = ContactForm(initial={'to': user.user.email, 'cc': request.user.email})
         return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
 
 
 @login_required(login_url='/login/')
 @user_passes_test(user_is_executive)
 def remind_user(request, user_id, document_type):
-    user = get_object_or_404(AbstractUserModel, id=user_id)
+    user = get_object_or_404(Client, user_id=user_id)
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -232,7 +231,7 @@ def remind_user(request, user_id, document_type):
                 body=message
             )
             msg.send()
-            messages.success(request, "The client {}, has been emailed successfully.".format(user.get_full_name))
+            messages.success(request, "The client {}, has been emailed successfully.".format(user.user.get_full_name()))
             form = ContactForm()
             return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
         else:
@@ -240,7 +239,7 @@ def remind_user(request, user_id, document_type):
             return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
     else:
         form = ContactForm(initial={'to': user.email, 'cc': request.user.email,
-                                    'subject': 'Hello, {}, please fill out this {} form.'.format(user.first_name,
+                                    'subject': 'Hello, {}, please fill out this {} form.'.format(user.user.first_name,
                                                                                                  document_type.upper()),
                                     'message': 'Hi, our systems indicate that we\'ve sent you an NDA form to complete, '
                                                'but we have not received the signed document. Your Raise executive, {}, '
@@ -307,7 +306,7 @@ def tokenized_form_handler(request, user_id, document_type, token):
 @login_required(login_url='/login/')
 @user_passes_test(user_is_executive)
 def send_document(request, user_id, document_type):
-    user = get_object_or_404(AbstractUserModel, id=user_id)
+    user = get_object_or_404(Client, user_id=user_id)
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -402,10 +401,3 @@ def generic_template_handler(request, template_id, custom_fields):
     raise_client.client.active_request_id = signature_request.signature_request_id
     raise_client.client.save()
     return signature_request
-    # DO something with this signature request - return response?
-    # for signature in signature_request.signatures:
-    #     embedded_obj = client.get_embedded_object(signature.signature_id)
-    #     sign_url = embedded_obj.sign_url
-    #     return sign_url
-
-    # return ""
