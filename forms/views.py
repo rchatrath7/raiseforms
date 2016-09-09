@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist, Q
 
+from django.apps import apps
+
 from django.conf import settings
 from django.http import HttpResponse
 
@@ -248,154 +250,59 @@ def remind_user(request, user_id, document_type):
 
 
 @login_required(login_url='/login/')
-def forms(request):
+@user_passes_test(user_is_executive)
+def onboard_forms(request, user_id, document_type):
     """
     We need to do a few things with this forms view. We need a generic view to handle creation of any given form,
     NDA, Statement of Work, Consulting Agreement, and Purchase Request. We need to allow the Executive to verify that
     the auto-generated information is correct and sign the document, then send the signed document to a Client. We also
     need to store the document in our database as well as an attachment in, say, SmartSheet or a Google Doc.
     :param request:
-    :return: HTML object: generated form (integrated with Docusign API), or gather information for that form.
+    :return: HTML object: generated form (integrated with HelloSign API), or gather information for that form.
     """
-    pass
-
-
-@login_required(login_url='/login/')
-@user_passes_test(user_is_executive)
-def nda(request, user_id):
     client = get_object_or_404(Client, user_id=user_id)
-    if request.method == 'POST':
-        form = NDAForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            custom_fields = [
-                {'email': cd['email']},
-                {"full_name": cd['name']},
-                {"corporation": cd['corporation']},
-                {"location": cd['location']},
-                {"title": cd['title']},
-                {"exec_title": request.user.executive.title if request.user.account_type == 'E' else client.executive.title},
-                {"exec_name": request.user.get_full_name() if request.user.account_type == 'E' else client.executive.user.get_full_name()}
-            ]
-            if request.user.account_type == 'E':
-                # create NDA relationship with client
-                if not client.nda:
-                    nda = NDA(
-                        ssn=cd['ssn'],
-                        location=cd['location'],
-                        corporation=cd['corporation'],
-                        title=cd['title'],
-                        executive=request.user.executive
-                    )
-                    nda.save()
-                    client.nda = nda
-                else:
-                    for field, value in cd.iteritems():
-                        if field not in ['email', 'full_name']:
-                            setattr(client.nda, field, value)
-                    client.nda.save()
-                if client.nda_file:
-                    client.nda_file = None
-                client.save()
-            elif request.user.account_type == 'C':
-                # save
-                if not client.nda:
-                    nda = NDA(
-                        ssn=cd['ssn'],
-                        location=cd['location'],
-                        corporation=cd['corporation'],
-                        title=cd['title'],
-                        executive=request.user.client.executive
-                    )
-                    nda.save()
-                    client.nda = nda
-                else:
-                    for field, value in cd.iteritems():
-                        if field not in ['email', 'full_name']:
-                            setattr(client.nda, field, value)
-                if client.nda_file:
-                    client.nda_file = None
-                client.save()
-            signature_request = generic_template_handler(request, "NDA", custom_fields)
-            messages.success(request,
-                             'The NDA form has been mailed for signatures. You can check it\'s status at {}.'.format(
-                signature_request.details_url))
-            return render(request, 'partials/nda_form.html', {'nda_form': NDAForm()})
-        else:
-            return render(request, 'partials/nda_form.html', {'form': form, 'status': client.nda_status,
-                                                              'document_type': 'nda', 'client': client})
-    else:
-        form = NDAForm()
-        # if client.nda_file:
-        #     file = client.nda_file.read()
-        # else:
-        #     file = None
-        return render(request, 'partials/nda_form.html', {'form': form, 'status': client.nda_status,
-                       'document_type': 'nda', 'client': client, 'document': client.nda_file})
+    types = {
+        'nda': NDAForm(request.POST or None, initial={'email': client.user.email, 'name': client.user.get_full_name()}),
+        'statement_of_work': StatementOfWorkForm(request.POST or None, initial={'email': client.user.email, 'name': client.user.get_full_name()}),
+        'consulting_agreement': ConsultingAgreementForm(request.POST or None, initial={'email': client.user.email, 'name': client.user.get_full_name()}),
+        'purchase_request': PurchaseRequestForm(request.POST or None, initial={'email': client.user.email, 'name': client.user.get_full_name()}),
+    }
+    form = types.get(document_type, None)
+    if form.is_valid():
+        cd = form.cleaned_data
+        custom_fields = [
+            {'email': cd['email']},
+            {"full_name": cd['name']},
+            {"exec_title": request.user.executive.title if request.user.account_type == 'E' else client.executive.title},
+            {"exec_name": request.user.get_full_name() if request.user.account_type == 'E' else client.executive.user.get_full_name()}
+        ]
+        stripped_type = document_type.replace('_', "")
+        model = getattr(client, document_type) or apps.get_model(app_label='forms', model_name=stripped_type).objects.create(executive=client.executive)
+        for field, value in cd.iteritems():
+            if field not in ['email', 'name']:
+                custom_fields.append({field:value})
+                setattr(model, field, value)
+        model.save()
+        setattr(client, document_type, model)
+        setattr(client, '{}_file'.format(document_type), None)
+        client.save()
+        signature_request = generic_template_handler(request, document_type, custom_fields)
+        messages.success(request,
+                         'The {} form has been mailed for signatures. You can check it\'s status at {}.'.format(document_type,
+            signature_request.details_url))
+        return redirect(request, 'clients/{}/'.format(client.user_id))
+    return render(request, 'partials/forms.html', {'form': form, 'status': getattr(client, '{}_status'.format(document_type)),
+                   'document_type': document_type, 'client': client, 'document': getattr(client, '{}_file'.format(document_type))})
 
 
 @login_required(login_url='/login/')
-def statement_of_work(request, client_id):
-    if request.method == 'POST':
-        form = NDAForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            custom_fields = [
-                {'email': cd['email']},
-                {"full_name": cd['name']},
-                {"corporation": cd['corporation']},
-                {"location": cd['location']},
-                {"title": cd['title']},
-                {"exec_title": request.user.executive.title},
-                {"exec_name": request.user.get_full_name()}
-            ]
-            if request.user.account_type == 'E':
-                # create NDA relationship with client
-                nda = NDA(
-                    ssn=cd['ssn'],
-                    location=cd['location'],
-                    corporation=cd['corporation'],
-                    title=cd['title'],
-                    executive=request.user.executive
-                )
-                nda.save()
-                client = AbstractUserModel.objects.get(id=client_id).client
-                client.nda = nda
-                if client.nda_file:
-                    client.nda_file = None
-                client.save()
-            elif request.user.account_type == 'C':
-                # save
-                nda = NDA(
-                    ssn=cd['ssn'],
-                    location=cd['location'],
-                    corporation=cd['corporation'],
-                    title=cd['title'],
-                    executive=request.user.client.executive
-                )
-                nda.save()
-                request.user.client.nda = NDA.objects.get(id=nda.id)
-                if request.user.client.nda_file:
-                    request.user.client.nda_file = None
-                request.user.client.save()
-            signature_request = generic_template_handler(request, "NDA", custom_fields)
-            messages.success(request, 'The NDA form has been mailed for signatures. You can check it\'s status at {}.').format(signature_request.details_url)
-            return render(request, 'partials/nda_form.html', {'nda_form': form})
-        else:
-            return render(request, 'partials/nda_form.html', {'nda_form': form})
+def tokenized_form_handler(request, user_id, document_type, token):
+    client = get_object_or_404(Client, user_id=user_id)
+    if client.generate_token(document_type) == token:
+        return onboard_forms(request, user_id, document_type)
     else:
-        form = NDAForm()
-        return render(request, 'partials/nda_form.html', {'nda_form': form})
+        return HttpResponseBadRequest("Error! Token is invalid!")
 
-@login_required(login_url='/login/')
-def purchase_request(request):
-    if request.method == 'POST':
-        form = PurchaseRequestForm(request.POST)
-        if form.is_valid:
-            cd = form.cleaned_data
-    else:
-        form = PurchaseRequestForm()
-    return render(request, 'partials/user_form.html', {'form': form})
 
 @login_required(login_url='/login/')
 @user_passes_test(user_is_executive)

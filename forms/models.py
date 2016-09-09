@@ -109,10 +109,10 @@ class Executive(models.Model):
 class NDA(models.Model):
     # TODO: Put in validators
     # NDA FORM
-    ssn = models.CharField(max_length=11)
-    location = models.CharField(max_length=100)
-    corporation = models.CharField(max_length=100)
-    title = models.CharField(max_length=20)
+    ssn = models.CharField(max_length=11, null=True)
+    location = models.CharField(max_length=100, null=True)
+    corporation = models.CharField(max_length=100, null=True)
+    title = models.CharField(max_length=20, null=True)
     agreement_date = models.DateTimeField(auto_now_add=True)
 
     # Relations
@@ -130,21 +130,21 @@ class NDA(models.Model):
 class StatementOfWork(models.Model):
     # TODO: Put in validators; Need to figure out how to handle the id; can use the auto-incrementing id or use the id
     # of the user; Also need to figure out handling tables
-    desc_of_services = models.TextField()
+    desc_of_services = models.TextField(null=True)
     # Not sure if we need this yet
-    agreement_date = models.DateTimeField(auto_now_add=True)
-    milestones = models.BooleanField()
+    agreement_date = models.DateTimeField(auto_now_add=True, null=True)
+    milestones = models.NullBooleanField()
     # Milestone tables
-    deliverables = models.BooleanField()
+    deliverables = models.NullBooleanField()
     # Deliverables Table
     # We can probably use a much better way of determining which payment method is used, but for now will just have fields
-    hourly_pricing = models.BooleanField()
-    fixed_pricing = models.BooleanField()
-    milestone_pricing = models.BooleanField()
-    hourly_rate = models.FloatField()
-    fixed_rate = models.FloatField()
-    milestone_rate = models.FloatField()
-    additional_terms_of_services = models.TextField()
+    hourly_pricing = models.NullBooleanField()
+    fixed_pricing = models.NullBooleanField()
+    milestone_pricing = models.NullBooleanField()
+    hourly_rate = models.FloatField(null=True)
+    fixed_rate = models.FloatField(null=True)
+    milestone_rate = models.FloatField(null=True)
+    additional_terms_of_services = models.TextField(null=True)
 
     # Relations
     executive = models.ForeignKey(Executive)
@@ -175,20 +175,20 @@ class ConsultingAgreement(models.Model):
 class PurchaseRequest(models.Model):
     # TODO: I'd like to add properties and in general cleaner ways of handling things
     date = models.DateTimeField(auto_now_add=True)
-    cost_center = models.CharField(max_length=50)
+    cost_center = models.CharField(max_length=50, null=True)
     # Client/Owner
     # requester = models.ForeignKey(Client)
-    owner = models.ForeignKey(Executive)
-    vendor = models.CharField(max_length=30)
-    description = models.TextField()
-    purpose = models.TextField()
-    amount = models.FloatField()
+    executive= models.ForeignKey(Executive)
+    vendor = models.CharField(max_length=30, null=True)
+    description = models.TextField(null=True)
+    purpose = models.TextField(null=True)
+    amount = models.FloatField(null=True)
     # This should be a date range, just adjust it to get the difference in time
-    service_period = models.DateTimeField()
+    service_period = models.DateTimeField(null=True)
     # Handle 'either-ors' better (invoice, payment_type, etc)
-    contract_present = models.BooleanField(default=False)
-    invoice_cadence_recurring = models.BooleanField(default=False)
-    recurring_date = models.DateTimeField()
+    contract_present = models.NullBooleanField()
+    invoice_cadence_recurring = models.NullBooleanField(default=False)
+    recurring_date = models.DateTimeField(null=True)
     choices = (
         ('ach', 'ACH'),
         ('credit', 'Credit'),
@@ -197,15 +197,15 @@ class PurchaseRequest(models.Model):
     )
     payment_type = models.CharField(choices=choices, max_length=6)
     payment_types = {
-        'ach': models.BooleanField(default=False),
-        'credit': models.BooleanField(default=False),
-        'check': models.BooleanField(default=False),
-        'abacus': models.BooleanField(default=False)
+        'ach': models.NullBooleanField(default=False),
+        'credit': models.NullBooleanField(default=False),
+        'check': models.NullBooleanField(default=False),
+        'abacus': models.NullBooleanField(default=False)
     }
-    payment_terms_net_30 = models.BooleanField(default=False)
-    payment_terms_receipt = models.BooleanField(default=False)
+    payment_terms_net_30 = models.NullBooleanField(default=False)
+    payment_terms_receipt = models.NullBooleanField(default=False)
 
-    additional_notes = models.TextField()
+    additional_notes = models.TextField(null=True)
 
     def __str__(self):
         return "<Purchase Request: %s, Date: %s, Cost Center: %s, Requester: %s, Owner: %s, Payment Type: %s>"\
@@ -281,22 +281,14 @@ class Client(models.Model):
             return "incomplete"
 
     def generate_token(self, document_type):
-        tokens = {
-            'nda': ['nda_token', self.nda_token],
-            'statement_of_work': ['statement_of_work_token', self.statement_of_work_token],
-            'consulting_agreement': ['consulting_agreement_token', self.consulting_agreement_token]
-         }
-        token = tokens.get(document_type, '')
+        token = getattr(self, '{}_token'.format(document_type))
         if token:
-            if len(token) == 16:
-                return token[1]
-            else:
-                new_token = os.urandom(8).encode('hex')
-                setattr(self, token[0], new_token)
-                return new_token
+            return token
         else:
-            return HttpResponseBadRequest("Error! Document type not found, acceptable document types include: 'NDA', "
-                                          "'Statement of Work', and 'Consulting Agreement'.")
+            new_token = os.urandom(8).encode('hex')
+            setattr(self, '{}_token'.format(document_type), new_token)
+            self.save()
+            return new_token
         # if document_type == 'nda':
         #     if not self.nda_token:
         #         self.nda_token = os.urandom(8).encode('hex')
