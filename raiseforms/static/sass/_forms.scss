@@ -75,3 +75,24 @@ button {
 .btn.sharp:hover {
   color: $purple;
 }
+
+.btn.update {
+  @extend .btn.sharp;
+  font-weight: inherit;
+  background-color: $green;
+  color: whitesmoke;
+}
+
+.btn.update:hover{
+  background-color: lighten($green, 15);
+  color: lighten(whitesmoke, 15);
+}
+
+.btn.deactivate {
+  @extend .btn.update;
+  background-color: $purple;
+}
+
+.btn.deactivate:hover{
+  background-color: lighten($purple, 15);
+}

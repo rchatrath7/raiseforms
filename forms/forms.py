@@ -1,5 +1,6 @@
 from django import forms
-from django.forms import widgets
+from django.forms import widgets, ModelForm
+from models import *
 from localflavor.us import forms as lf_forms
 
 
@@ -10,6 +11,46 @@ class ClientForm(forms.Form):
     password = forms.CharField(widget=widgets.PasswordInput(attrs={'class': 'pure-u-1'}))
     email = forms.EmailField(widget=widgets.EmailInput(attrs={'class': 'pure-u-1'}))
     address = forms.CharField(widget=forms.TextInput(attrs={'class': 'pure-u-1'}))
+
+
+class ManageClientForm(ModelForm):
+    updated = []
+    class Meta:
+        model = Client
+        fields = ['address']
+
+    def clean(self):
+        cleaned_data = super(ManageClientForm, self).clean()
+        if self.instance.pk is not None:
+            for field, value in self.fields.iteritems():
+                if getattr(self.instance, field) != cleaned_data[field]:
+                    self.updated.append(field)
+        return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super(ManageClientForm, self).__init__(*args, **kwargs)
+        for key, value in self.fields.iteritems():
+            self.fields[key].widget.attrs['class'] = 'pure-u-23-24'
+
+
+class ManageUserForm(ModelForm):
+    updated = []
+    class Meta:
+        model = AbstractUserModel
+        fields = ['email', 'first_name', 'last_name']
+
+    def clean(self):
+        cleaned_data = super(ManageUserForm, self).clean()
+        if self.instance.pk is not None:
+            for field, value in self.fields.iteritems():
+                if getattr(self.instance, field) != cleaned_data[field]:
+                    self.updated.append(field)
+        return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super(ManageUserForm, self).__init__(*args, **kwargs)
+        for key, value in self.fields.iteritems():
+            self.fields[key].widget.attrs['class'] = 'pure-u-23-24'
 
 
 class ContactForm(forms.Form):

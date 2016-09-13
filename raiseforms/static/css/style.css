@@ -80,7 +80,7 @@ button {
 }
 
 /* line 68, ../sass/_forms.scss */
-.btn.sharp {
+.btn.sharp, .btn.update, .btn.deactivate {
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
@@ -90,8 +90,31 @@ button {
 }
 
 /* line 75, ../sass/_forms.scss */
-.btn.sharp:hover {
+.btn.sharp:hover, .btn.update:hover, .btn.deactivate:hover {
   color: #B12E55;
+}
+
+/* line 79, ../sass/_forms.scss */
+.btn.update, .btn.deactivate {
+  font-weight: inherit;
+  background-color: #4ED1AA;
+  color: whitesmoke;
+}
+
+/* line 86, ../sass/_forms.scss */
+.btn.update:hover, .btn.deactivate:hover {
+  background-color: #8be1c7;
+  color: white;
+}
+
+/* line 91, ../sass/_forms.scss */
+.btn.deactivate {
+  background-color: #B12E55;
+}
+
+/* line 96, ../sass/_forms.scss */
+.btn.deactivate:hover {
+  background-color: #d4587d;
 }
 
 /* line 21, ../sass/style.scss */
