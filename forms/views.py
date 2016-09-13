@@ -382,6 +382,30 @@ def manage(request, user_id):
     return render(request, 'partials/manage.html', {'client_form': client_form, 'user_form': user_form, 'client': client})
 
 
+@login_required(login_url='/login/')
+@user_passes_test(user_is_executive)
+def deactivate(request, user_id):
+    if request.method == 'POST':
+        client = get_object_or_404(Client, user_id=user_id)
+        client.user.is_active = False
+        client.user.save()
+        messages.success(request, "%s has been deactivated. You will not be able to see %s in any searches" %
+                         (client.user.get_full_name(), client.user.first_name))
+    return redirect('/clients/{}/manage'.format(user_id))
+
+
+@login_required(login_url='/login/')
+@user_passes_test(user_is_executive)
+def reactivate(request, user_id):
+    if request.method == 'POST':
+        client = get_object_or_404(Client, user_id=user_id)
+        client.user.is_active = True
+        client.user.save()
+        messages.success(request, "%s has been reactivate. You will now see them in searches and be able to generate "
+                                  "forms for them." % client.user.get_full_name())
+    return redirect('/clients/{}/manage'.format(user_id))
+
+
 def generic_template_handler(request, template_id, custom_fields):
     '''
     Take in a request, template type (NDA, Consulting Agreement, Fields, etc.) and get the hellosign template. This will

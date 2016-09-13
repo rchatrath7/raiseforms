@@ -32,6 +32,8 @@ urlpatterns = [
     url(r'^clients/(?P<user_id>\d+)/$', views.client_panel),
     url(r'^clients/(?P<user_id>\d+)/contact/$', views.contact),
     url(r'^clients/(?P<user_id>\d+)/manage/$', views.manage),
+    url(r'^clients/(?P<user_id>\d+)/manage/deactivate/$', views.deactivate),
+    url(r'^clients/(?P<user_id>\d+)/manage/reactivate/$', views.reactivate),
     url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/$', views.onboard_forms),
     url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/remind_user/$', views.remind_user),
     url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/send/$', views.send_document),
