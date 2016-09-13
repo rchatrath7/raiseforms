@@ -375,23 +375,10 @@ def manage(request, user_id):
     client_form = ManageClientForm(request.POST or None, instance=client)
     user_form = ManageUserForm(request.POST or None, instance=client.user)
     if client_form.is_valid() and user_form.is_valid():
-        values = [f if client_form.cleaned_data[f] != getattr(client, f) else None for f in list(client_form.fields)] + \
-                 [f if user_form.cleaned_data[f] != getattr(client.user, f) else None for f in list(user_form.fields)]
-        # client_form.save()
-        # user_form.save()
-        print >> sys.stderr, "<Fields: %s, Type: %s>" % (client_form.updated, type(client_form.updated))
         messages.success(request, "You've succesfully updated the following fields: '%s'" % ', '.join(client_form.updated + user_form.updated))
     else:
         if request.method != 'GET':
             messages.error(request, 'Please correct the errors below')
-
-    # values = [getattr(client, field.name) for field in client._meta.fields] + [getattr(client.user, field.name) for field in client.user._meta.fields]
-    #
-    # # final = [f.name if getattr(client, f.name) == v else None for v in values for f in client._meta.get_fields()] + \
-    # #         [f.name if getattr(client.user, f.name) == v else None for v in values for f in
-    # #          client.user._meta.get_fields()]
-    # # messages.success(request, "You've successfully updated the following fields: %s") % filter(None, final)
-    # # messages.error(request, 'Please correct the error below')
     return render(request, 'partials/manage.html', {'client_form': client_form, 'user_form': user_form, 'client': client})
 
 

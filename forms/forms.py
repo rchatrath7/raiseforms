@@ -20,6 +20,7 @@ class ManageClientForm(ModelForm):
         fields = ['address']
 
     def clean(self):
+        self.updated = []
         cleaned_data = super(ManageClientForm, self).clean()
         if self.instance.pk is not None:
             for field, value in self.fields.iteritems():
@@ -40,6 +41,7 @@ class ManageUserForm(ModelForm):
         fields = ['email', 'first_name', 'last_name']
 
     def clean(self):
+        self.updated = []
         cleaned_data = super(ManageUserForm, self).clean()
         if self.instance.pk is not None:
             for field, value in self.fields.iteritems():
