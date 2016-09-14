@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^accounts/invite/$', views.invite_client),
     url(r'^accounts/register/(?P<auth_token>[\w\-]+)/$', views.register),
     url(r'^accounts/search/$', views.search),
+    url(r'^accounts/search/(?P<query>[\w\-]+)/(?P<flag>[\w\-]+)/$', views.search),
     url(r'^clients/(?P<user_id>\d+)/$', views.client_panel),
     url(r'^clients/(?P<user_id>\d+)/contact/$', views.contact),
     url(r'^clients/(?P<user_id>\d+)/manage/$', views.manage),

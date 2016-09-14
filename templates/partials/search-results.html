@@ -1,8 +1,36 @@
 {% extends 'partials/index.html' %}
 {% block content %}
     <script type="text/javascript">
+        $(document).ready(function() {
+            flag = window.location.href;
+            flag = flag.split("/").reverse()[1] != 'search' ? flag.split("/").reverse()[1] : 'first_name';
+            $('#sort').val(flag);
+        });
+
         function redirect(url){
             window.location.href = url;
+        }
+
+        function showInactiveClients() {
+            {% for client in clients %}
+                document.getElementById({{ client.id }}).style.display = 'Block';
+            {% endfor %}
+            document.getElementById('showInactiveClients').style.display = 'None';
+            document.getElementById('hideInactiveClients').style.display = 'Inline';
+        }
+
+        function hideInactiveClients() {
+            {% for client in clients %}
+                {% if not client.user.is_active %}
+                    document.getElementById({{ client.id }}).style.display = 'None';
+                {% endif %}
+            {% endfor %}
+            document.getElementById('showInactiveClients').style.display = 'Inline';
+            document.getElementById('hideInactiveClients').style.display = 'None';
+        }
+
+        function sort(flag) {
+            redirect('/accounts/search/{{ query }}/'+flag.value)
         }
     </script>
     {% if not messages %}
@@ -14,20 +42,20 @@
                          Search results for <strong style="color:#4ED1AA">{% if query != 'browse' and query != ''%} "{{ query }}" {% else %} "all" {% endif %}</strong>
                     </p>
                 </div>
-{#                <div class="pure-u-1-8">#}
-{#                    <strong>Sort By:</strong>#}
-{#                    <select title="sort" style="display:inline">#}
-{#                        <option value="first_name">First Name</option>#}
-{#                        <option value="last_name">Last Name</option>#}
-{#                        <option value="id">ID</option>#}
-{#                        <option value="email">Email</option>#}
-{#                    </select>#}
-{#                </div>#}
+                <div class="pure-u-1-8">
+                    <strong>Sort By:</strong>
+                    <select class="pure-u-2-3" title="sort" style="display:inline" onchange="sort(this)" id="sort">
+                        <option value="first_name">First Name</option>
+                        <option value="last_name">Last Name</option>
+                        <option value="id">ID</option>
+                        <option value="email">Email</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="client-info">
-            {% for client in clients|dictsort:'user.first_name' %}
-                <form>
+            {% for client in clients|dictsort:flag %}
+                <form {% if not client.user.is_active %} style="display:None"{% endif %} id={{ client.id }}>
                     <fieldset>
                         <legend><a href="/clients/{{ client.user_id }}">{{ client.user.get_full_name }}</a></legend>
                         <div class="pure-u-1">
@@ -48,6 +76,8 @@
                     </fieldset>
                 </form>
             {% endfor %}
+             <a id="hideInactiveClients" href="#" onclick="hideInactiveClients()" style="display:None; color:#337ab7; margin: auto">Hide inactive clients</a>
+             <a id="showInactiveClients" href="#" onclick="showInactiveClients()" style="color:#337ab7; margin: auto">Show inactive Clients</a>
         </div>
         {% elif query != "browse" %}
             <div class="centered-container">
