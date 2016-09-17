@@ -41,9 +41,10 @@
                             {% if user.is_authenticated %}
                                 <li style="float:right"><a href="/logout/">Logout {{ user }}</a></li>
                                 {% csrf_token %}
-                                <li style="margin-left: 25%; width: 43%; font-family: 'Open Sans', sans-serif;">
+                                <li style="margin-left: 25%; width: 43%; font-family: 'Open Sans', sans-serif; {% if request.user.account_type == 'C' %} display: none{% endif %}">
                                     <input class="pure-u-21-24" name="search" title="search" placeholder="Search for a client..." formaction="/accounts/search/" formmethod="post">
                                     <input class="pure-u-2-24 btn btn green" style="padding: 5px" type="submit" formaction="/accounts/search/" formmethod="post" value="Search">
+                                </li>
                                 {% else %}
                                     {% csrf_token %}
                                     <li style="float:right"><a style="cursor: pointer" onclick="login.submit()">Login</a></li>

@@ -38,8 +38,8 @@
                             {% endif %}
                         </div>
                         <div class="modal-footer">
-                            {% csrf_token %}
                             {% if status == 'incomplete' %}
+                                {% csrf_token %}
                                 <div class="pure-g">
                                     <div class="pure-u-1">
                                         <div class="pure-u-3-4">
@@ -48,6 +48,7 @@
                                     </div>
                                 </div>
                                 {% elif status == 'pending' %}
+                                    {% csrf_token %}
                                     <div class="pure-g">
                                         <div class="pure-u-1">
                                             <div class="pure-u-1-2">
@@ -61,7 +62,7 @@
                                 {% else %}
                                     <div class="pure-g">
                                         <div class="pure-u-1">
-                                            <input name="cancel" class="pure-u-1 btn btn green" type="submit" value="Close">
+                                            <button type="button" name="cancel" class="pure-u-1 btn btn green" onclick="closeModal()">Close</button>
                                         </div>
                                     </div>
                             {% endif %}

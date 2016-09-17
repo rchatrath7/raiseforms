@@ -12,6 +12,11 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 
+from functools import wraps
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.utils.decorators import available_attrs
+import urlparse
+
 from django.core.mail import EmailMultiAlternatives
 from django.core.files import File
 
@@ -25,7 +30,38 @@ import os
 import tempfile
 
 # Create your views here.
-# TODO: Add an "all-purpose" form view
+# This is a modified version of the 'user_passes_test' decorator.
+# It's a simple, hacky way to pass a request object to the test
+# instead of request.user
+
+
+def request_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
+    """
+    Decorator for views that checks that the request passes the given test,
+    redirecting to the log-in page if necessary. The test should be a callable
+    that takes the request object and returns True if the request passes.
+    """
+
+    def decorator(view_func):
+        @wraps(view_func, assigned=available_attrs(view_func))
+        def _wrapped_view(request, *args, **kwargs):
+            if test_func(request):
+                return view_func(request, *args, **kwargs)
+            path = request.build_absolute_uri()
+            # If the login url is the same scheme and net location then just
+            # use the path as the "next" url.
+            login_scheme, login_netloc = urlparse.urlparse(login_url or
+                                                           settings.LOGIN_URL)[:2]
+            current_scheme, current_netloc = urlparse.urlparse(path)[:2]
+            if ((not login_scheme or login_scheme == current_scheme) and
+                    (not login_netloc or login_netloc == current_netloc)):
+                path = request.get_full_path()
+            from django.contrib.auth.views import redirect_to_login
+            return redirect_to_login(path, login_url, redirect_field_name)
+
+        return _wrapped_view
+
+    return decorator
 
 
 def user_is_executive(request):
@@ -35,8 +71,12 @@ def user_is_executive(request):
         return False
 
 
-# def user_has_token(request, token):
-#     if request.user.
+def user_has_access(request):
+    if request.user.account_type == 'E' or request.user.id == int(request.path.rsplit("/")[2]):
+        return True
+    else:
+        return False
+
 
 def login_handler(request):
     if request.method == 'POST':
@@ -70,6 +110,17 @@ def home(request):
     :param request:
     :return: HTML object, either a login page, or a the main page.
     """
+    if request.user.account_type == 'C':
+        client = get_object_or_404(Client, user_id=request.user.id)
+        client_form = ManageClientForm(instance=client)
+        user_form = ManageUserForm(instance=request.user)
+        pending = [document if getattr(client, '{}_status'.format(document)) == 'pending' else None
+                          for document in ['nda', 'statement_of_work', 'consulting_agreement']]
+        completed = [document if getattr(client, '{}_status'.format(document)) == 'completed' else None
+                            for document in ['nda', 'statement_of_work', 'consulting_agreement']]
+        return render(request, 'partials/client-home.html',
+                      {'client_form': client_form, 'user_form': user_form, 'client': client, 'pending': pending,
+                       'completed': completed})
     return render(request, 'partials/home.html')
 
 
@@ -132,7 +183,6 @@ def invite_client(request):
         return render(request, 'partials/invite-client.html')
 
 
-# @user_passes_test()
 def register(request, auth_token):
     token = get_object_or_404(Client, token=auth_token)
     is_expired = datetime.utcnow() >= token.expired
@@ -370,17 +420,22 @@ def retrieve(request, user_id, document_type):
 
 
 @login_required(login_url='/login/')
-@user_passes_test(user_is_executive)
+@request_passes_test(user_has_access, login_url='/login/')
 def manage(request, user_id):
     client = get_object_or_404(Client, user_id=user_id)
     client_form = ManageClientForm(request.POST or None, instance=client)
     user_form = ManageUserForm(request.POST or None, instance=client.user)
     if client_form.is_valid() and user_form.is_valid():
+        client_form.save()
+        user_form.save()
         messages.success(request, "You've succesfully updated the following fields: '%s'" % ', '.join(client_form.updated + user_form.updated))
     else:
         if request.method != 'GET':
             messages.error(request, 'Please correct the errors below')
-    return render(request, 'partials/manage.html', {'client_form': client_form, 'user_form': user_form, 'client': client})
+    if request.user.account_type == 'E':
+        return render(request, 'partials/manage.html', {'client_form': client_form, 'user_form': user_form, 'client': client})
+    else:
+        return render(request, 'partials/client-home.html', {'client_form': client_form, 'user_form': user_form, 'client': client})
 
 
 @login_required(login_url='/login/')

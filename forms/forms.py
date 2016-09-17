@@ -15,6 +15,7 @@ class ClientForm(forms.Form):
 
 class ManageClientForm(ModelForm):
     updated = []
+
     class Meta:
         model = Client
         fields = ['address']
@@ -36,6 +37,10 @@ class ManageClientForm(ModelForm):
 
 class ManageUserForm(ModelForm):
     updated = []
+    password = forms.CharField(widget=widgets.PasswordInput(attrs={'class': 'pure-u-23-24'}), required=False)
+    new_password = forms.CharField(widget=widgets.PasswordInput(attrs={'class': 'pure-23-24'}), required=False)
+    confirm_password = forms.CharField(widget=widgets.PasswordInput(attrs={'class': 'pure-23-24'}), required=False)
+
     class Meta:
         model = AbstractUserModel
         fields = ['email', 'first_name', 'last_name']
@@ -45,9 +50,27 @@ class ManageUserForm(ModelForm):
         cleaned_data = super(ManageUserForm, self).clean()
         if self.instance.pk is not None:
             for field, value in self.fields.iteritems():
-                if getattr(self.instance, field) != cleaned_data[field]:
-                    self.updated.append(field)
+                if field not in ['password', 'new_password', 'confirm_password']:
+                    if getattr(self.instance, field) != cleaned_data[field]:
+                        self.updated.append(field)
+                else:
+                    if cleaned_data[field] is not None:
+                        self.updated.append(field)
         return cleaned_data
+
+    def save(self, commit=True):
+        user = super(ManageUserForm, self).save(commit=False)
+        password = self.cleaned_data["password"]
+        new_password = self.cleaned_data["new_password"]
+        confirm_password = self.cleaned_data["confirm_password"]
+
+        if password and new_password and confirm_password:
+            if user.check_password(password) and new_password == confirm_password:
+                user.set_password(new_password)
+        if commit:
+            user.save()
+        return user
+
 
     def __init__(self, *args, **kwargs):
         super(ManageUserForm, self).__init__(*args, **kwargs)

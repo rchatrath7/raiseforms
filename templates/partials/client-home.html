@@ -1,0 +1,128 @@
+{% extends 'partials/index.html' %}
+{% block content %}
+     <form class="pure-form pure-form-stacked">
+        <script type="text/javascript">
+            function closeModal() {
+                $('#emailModal').modal('hide');
+            }
+        </script>
+        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" id="emailModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                         <a class="close" onclick="closeModal()">×</a>
+                         <h3>{{ document|upper }} form</h3>
+                    </div>
+                    <fieldset>
+                        <div class="modal-body">
+                           <div class="centered-container">
+                                <div class="centered">
+                                    <div class="floating-login-box">
+                                       <h1>Please fill out this {{ document|upper }} form for {{ client.user.get_full_name }}</h1>
+                                        <fieldset>
+                                            <div class="pure-g">
+                                                {% for field in form %}
+                                                    <div class="pure-u-1">
+                                                        {{ field.label }}
+                                                        {{ field }}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            {% csrf_token %}
+                            <div class="pure-g">
+                                <div class="pure-u-1">
+                                    <div class="pure-u-1-2">
+                                        <input class="pure-u-1 btn btn green" type="submit" formaction="/clients/{{ client.user_id }}/forms/{{ document }}/" formmethod="post" value="Submit">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="centered-container">
+        <div class="centered">
+            <div class="floating-control-panel">
+                <div class="client-info client-panel">
+                    <h2>Welcome {{ client.user.get_full_name }}!</h2>
+                    <form class="pure-form pure-form-stacked">
+                        <fieldset>
+                            <legend><strong>Manage</strong></legend>
+                            {% if client.user.is_active %}
+                                <div class="pure-g">
+                                    <div class="pure-u-md-1-2">
+                                        {{ user_form.email.label }}
+                                        {{ user_form.email }}
+                                    </div>
+                                    <div class="pure-u-md-1-2">
+                                        {{ client_form.address.label }}
+                                        {{ client_form.address }}
+                                    </div>
+                                    <div class="pure-u-md-1-2">
+                                        {{ user_form.first_name.label }}
+                                        {{ user_form.first_name }}
+                                    </div>
+                                    <div class="pure-u-md-1-2">
+                                        {{ user_form.last_name.label }}
+                                        {{ user_form.last_name }}
+                                    </div>
+                                    <div class="pure-u-md-1-3">
+                                        {{ user_form.password.label }}
+                                        {{ user_form.password }}
+                                    </div>
+                                    <div class="pure-u-md-1-3">
+                                        {{ user_form.new_password.label }}
+                                        {{ user_form.new_password }}
+                                    </div>
+                                    <div class="pure-u-md-1-3">
+                                        {{ user_form.confirm_password.label }}
+                                        {{ user_form.confirm_password }}
+                                    </div>
+                                    {% csrf_token %}
+                                    <div class="pure-u-md-2-3">
+                                        <input type="submit" class="btn update pure-u-1" value="Update" formaction="/clients/{{ client.user_id }}/manage/" formmethod="post"/>
+                                    </div>
+                                    <div class="pure-u-md-1-3">
+                                        <input type="submit" class="btn deactivate pure-u-23-24" value="Request Deactivation" formaction="deactivate/" formmethod="post"/>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </fieldset>
+                        <fieldset>
+                            <legend><strong>Pending Forms</strong></legend>
+                                <div class="pure-g">
+                                    {% for document in pending %}
+                                        <div class="pure-u-1">
+                                            {% if document %}
+                                                <span class="fa fa-pencil-square-o">{{ document }}</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend><strong>Completed Forms</strong></legend>
+                            <div class="pure-g">
+                                {% for document in completed %}
+                                    <div class="pure-u-1">
+                                        {% if document %}
+                                            <span class="fa fa-file-pdf-o">{{ document }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

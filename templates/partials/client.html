@@ -16,7 +16,9 @@
                                 <p>{{ client.user.email }} ({{ client.user_id }}){% if client.address %} | {{ client.address }}{% endif %}
                                     | {% if client.user.is_active %}Active {% else %}Inactive {% endif %} |
                                     <i class="fa fa-envelope-o edit-button" onclick="redirect('/clients/{{ client.user_id }}/contact')"><span class="edit-button"> Email</span></i> |
-                                    <i class="fa fa-cog edit-button" onclick="redirect('/clients/{{ client.user_id }}/manage')"><span class="edit-button"> Manage</span></i>
+                                    <i class="fa fa-cog edit-button" onclick="{% if request.user.account_type == 'C' %}redirect('/clients/{{ client.user_id }}/manage'){% else %}{% endif %}">
+                                        <span class="edit-button"> Manage</span>
+                                    </i>
                                 </p>
                             </div>
                             <div class="pure-u-1">
