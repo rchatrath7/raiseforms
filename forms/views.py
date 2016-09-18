@@ -118,9 +118,15 @@ def home(request):
                           for document in ['nda', 'statement_of_work', 'consulting_agreement']]
         completed = [document if getattr(client, '{}_status'.format(document)) == 'completed' else None
                             for document in ['nda', 'statement_of_work', 'consulting_agreement']]
+        forms = {
+            'nda': NDAForm(request.POST or None, initial={'email': client.user.email, 'name': client.user.get_full_name()}),
+            'statement_of_work': StatementOfWorkForm(request.POST or None, initial={'email': client.user.email, 'name': client.user.get_full_name()}),
+            'consulting_agreement': ConsultingAgreementForm(request.POST or None, initial={'email': client.user.email, 'name': client.user.get_full_name()}),
+            'purchase_request': PurchaseRequestForm(request.POST or None, initial={'email': client.user.email, 'name': client.user.get_full_name()}),
+        }
         return render(request, 'partials/client-home.html',
                       {'client_form': client_form, 'user_form': user_form, 'client': client, 'pending': pending,
-                       'completed': completed})
+                       'completed': completed, 'forms': forms})
     return render(request, 'partials/home.html')
 
 
@@ -332,7 +338,7 @@ def onboard_forms(request, user_id, document_type):
         stripped_type = document_type.replace('_', "")
         model = getattr(client, document_type) or apps.get_model(app_label='forms', model_name=stripped_type).objects.create(executive=client.executive)
         for field, value in cd.iteritems():
-            if field not in ['email', 'name']:
+            if field not in ['email', 'name', 'ssn']:
                 custom_fields.append({field:value})
                 setattr(model, field, value)
         model.save()
@@ -343,7 +349,7 @@ def onboard_forms(request, user_id, document_type):
         messages.success(request,
                          'The {} form has been mailed for signatures. You can check it\'s status at {}.'.format(document_type,
             signature_request.details_url))
-        return redirect(request, 'clients/{}/'.format(client.user_id))
+        return redirect('clients/{}/'.format(client.user_id))
     return render(request, 'partials/forms.html', {'form': form, 'status': getattr(client, '{}_status'.format(document_type)),
                    'document_type': document_type, 'client': client, 'document': getattr(client, '{}_file'.format(document_type))})
 
@@ -482,7 +488,7 @@ def generic_template_handler(request, template_id, custom_fields):
     signature_request = client.send_signature_request_with_template(
                                     test_mode=True,
                                     # client_id=settings.CLIENT_ID,
-                                    template_id=settings.TEMPLATE_IDS.get(template_id),
+                                    template_id=settings.TEMPLATE_IDS.get(template_id.upper()),
                                     title="{0} form with Raise Inc.".format(template_id),
                                     subject="Please sign this {0} form".format(template_id),
                                     message="Please sign and verify all fields on this {0} form.".format(template_id),

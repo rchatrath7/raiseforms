@@ -1,53 +1,15 @@
 {% extends 'partials/index.html' %}
 {% block content %}
-     <form class="pure-form pure-form-stacked">
-        <script type="text/javascript">
-            function closeModal() {
-                $('#emailModal').modal('hide');
-            }
-        </script>
-        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" id="emailModal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                         <a class="close" onclick="closeModal()">×</a>
-                         <h3>{{ document|upper }} form</h3>
-                    </div>
-                    <fieldset>
-                        <div class="modal-body">
-                           <div class="centered-container">
-                                <div class="centered">
-                                    <div class="floating-login-box">
-                                       <h1>Please fill out this {{ document|upper }} form for {{ client.user.get_full_name }}</h1>
-                                        <fieldset>
-                                            <div class="pure-g">
-                                                {% for field in form %}
-                                                    <div class="pure-u-1">
-                                                        {{ field.label }}
-                                                        {{ field }}
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                        </fieldset>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            {% csrf_token %}
-                            <div class="pure-g">
-                                <div class="pure-u-1">
-                                    <div class="pure-u-1-2">
-                                        <input class="pure-u-1 btn btn green" type="submit" formaction="/clients/{{ client.user_id }}/forms/{{ document }}/" formmethod="post" value="Submit">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
-            </div>
-        </div>
-    </form>
+    {% load apptags %}
+     <script type="text/javascript">
+        function showModal() {
+            $('#formModal').modal('show');
+        }
+
+        function closeModal() {
+            $('#formModal').modal('hide');
+        }
+    </script>
     <div class="centered-container">
         <div class="centered">
             <div class="floating-control-panel">
@@ -102,7 +64,48 @@
                                     {% for document in pending %}
                                         <div class="pure-u-1">
                                             {% if document %}
-                                                <span class="fa fa-pencil-square-o">{{ document }}</span>
+                                                <span class="fa fa-pencil-square-o" onclick="showModal()"> {{ document|upper }}</span>
+                                                 <form class="pure-form pure-form-stacked">
+                                                    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" id="formModal">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                     <a class="close" onclick="closeModal()">×</a>
+                                                                     <h3>{{ document|upper }} form</h3>
+                                                                </div>
+                                                                <fieldset>
+                                                                    <div class="modal-body" style="height: auto">
+                                                                       <div class="centered-container" style="height: auto">
+                                                                            <div class="centered">
+                                                                                <div class="floating-login-box" style="height: auto">
+                                                                                   <h1>Please fill out this {{ document|upper }} form for {{ client.user.get_full_name }}</h1>
+                                                                                    <fieldset>
+                                                                                        <div class="pure-g">
+                                                                                            {% for field in forms|get_item:document %}
+                                                                                                <div class="pure-u-1">
+                                                                                                    {{ field.label }}
+                                                                                                    {{ field }}
+                                                                                                </div>
+                                                                                            {% endfor %}
+                                                                                        </div>
+                                                                                    </fieldset>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        {% csrf_token %}
+                                                                        <div class="pure-g">
+                                                                            <div class="pure-u-1">
+                                                                                <input class="pure-u-1 btn btn green" type="submit" formaction="/clients/{{ client.user_id }}/forms/{{ document }}/" formmethod="post" value="Submit">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </fieldset>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             {% endif %}
                                         </div>
                                     {% endfor %}
@@ -114,7 +117,7 @@
                                 {% for document in completed %}
                                     <div class="pure-u-1">
                                         {% if document %}
-                                            <span class="fa fa-file-pdf-o">{{ document }}</span>
+                                            <a href="#" onclick="showModal()"> {{ document|upper }}</a>
                                         {% endif %}
                                     </div>
                                 {% endfor %}
