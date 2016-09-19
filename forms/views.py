@@ -333,8 +333,31 @@ def onboard_forms(request, user_id, document_type):
             {'email': cd['email']},
             {"full_name": cd['name']},
             {"exec_title": request.user.executive.title if request.user.account_type == 'E' else client.executive.title},
-            {"exec_name": request.user.get_full_name() if request.user.account_type == 'E' else client.executive.user.get_full_name()}
+            {"exec_name": request.user.get_full_name() if request.user.account_type == 'E' else client.executive.user.get_full_name()},
         ]
+        if document_type == 'statement_of_work':
+            if request.POST['milestone2']:
+                custom_fields.append({'milestone': 'Project Commencement'})
+                custom_fields.append({'milestone6': 'Project Completion'})
+                for i in range(1, 7):
+                    if request.POST['milestone{0}'.format(i)] and request.POST['milestone_desc{0}'.format(i) and
+                                    request.POST['milestone_date{0}'.format(i)]]:
+                        custom_fields.append({'milestone{0}'.format(i): request.POST['milestone{0}'.format(i)]})
+                        custom_fields.append({'milestone_desc{0}'.format(i): request.POST['milestone_desc{0}'.format(i)]})
+                        custom_fields.append({'milestone_date{0}'.format(i): request.POST['milestone_date{0}'.format(i)]})
+            if request.POST['deliverables1']:
+                for i in range(1, 6):
+                    if request.POST['deliverables{0}'.format(i)] and request.POST['deliverables_desc{0}'.format(i) and
+                            request.POST['deliverables_date{0}'.format(i)]]:
+                        custom_fields.append({'deliverables{0}'.format(i): request.POST['deliverables{0}'.format(i)]})
+                        custom_fields.append({'deliverables_desc{0}'.format(i): request.POST['deliverables_desc{0}'.format(i)]})
+                        custom_fields.append({'deliverables_date{0}'.format(i): request.POST['deliverables_date{0}'.format(i)]})
+            if request.POST['fees1']:
+                for i in range(1, 6):
+                    if request.POST['fees{0}'.format(i)] and request.POST['fees_date{0}'.format(i)]:
+                        custom_fields.append({'fees{0}'.format(i): request.POST['fees{0}'.format(i)]})
+                        custom_fields.append({'fees_date{0}'.format(i): request.POST['fees_date{0}'.format(i)]})
+
         stripped_type = document_type.replace('_', "")
         model = getattr(client, document_type) or apps.get_model(app_label='forms', model_name=stripped_type).objects.create(executive=client.executive)
         for field, value in cd.iteritems():
@@ -349,7 +372,7 @@ def onboard_forms(request, user_id, document_type):
         messages.success(request,
                          'The {} form has been mailed for signatures. You can check it\'s status at {}.'.format(document_type,
             signature_request.details_url))
-        return redirect('clients/{}/'.format(client.user_id))
+        return redirect('/clients/{}/'.format(client.user_id))
     return render(request, 'partials/forms.html', {'form': form, 'status': getattr(client, '{}_status'.format(document_type)),
                    'document_type': document_type, 'client': client, 'document': getattr(client, '{}_file'.format(document_type))})
 
@@ -485,17 +508,20 @@ def generic_template_handler(request, template_id, custom_fields):
         {'role_name': 'Client', 'name': custom_fields[1]['full_name'], "email_address": custom_fields[0]['email']}
     ]
     raise_client = get_object_or_404(AbstractUserModel, email=custom_fields[0]['email'])
-    signature_request = client.send_signature_request_with_template(
-                                    test_mode=True,
-                                    # client_id=settings.CLIENT_ID,
-                                    template_id=settings.TEMPLATE_IDS.get(template_id.upper()),
-                                    title="{0} form with Raise Inc.".format(template_id),
-                                    subject="Please sign this {0} form".format(template_id),
-                                    message="Please sign and verify all fields on this {0} form.".format(template_id),
-                                    signing_redirect_url=None,
-                                    signers=signers,
-                                    custom_fields=custom_fields[1:]
-    )
+    try:
+        signature_request = client.send_signature_request_with_template(
+                                        test_mode=True,
+                                        # client_id=settings.CLIENT_ID,
+                                        template_id=settings.TEMPLATE_IDS.get(template_id.upper()),
+                                        title="{0} form with Raise Inc.".format(template_id),
+                                        subject="Please sign this {0} form".format(template_id),
+                                        message="Please sign and verify all fields on this {0} form.".format(template_id),
+                                        signing_redirect_url=None,
+                                        signers=signers,
+                                        custom_fields=custom_fields[1:]
+        )
+    except Exception:
+        return None
     raise_client.client.active_request_id = signature_request.signature_request_id
     raise_client.client.save()
     return signature_request

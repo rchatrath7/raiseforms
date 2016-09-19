@@ -72,6 +72,28 @@ button {
   text-align: center;
 }
 
+div.pure-u-1 {
+  > ul {
+    list-style-type: none;
+    > li {
+      display: inline-block;
+      label {
+        float: left;
+        clear: none;
+        display: block;
+        padding: 2px 1em 0 0;
+      }
+
+      input[type=radio],
+      input.radio {
+          float: left;
+          clear: none;
+          margin: 4px;
+      }
+    }
+  }
+}
+
 .btn.sharp:hover {
   color: $purple;
 }

@@ -1,14 +1,65 @@
 {% extends 'partials/index.html' %}
 {% block content %}
-    <form>
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $('#emailModal').modal('show');
-            });
-            function closeModal() {
-                $('#emailModal').modal('hide');
+    <script type="text/javascript">
+        String.prototype.format = function() {
+              var str = this;
+              for (var i = 0; i < arguments.length; i++) {
+                var reg = new RegExp("\\{" + i + "\\}", "gm");
+                str = str.replace(reg, arguments[i]);
+              }
+              return str;
+        };
+        function setRequired(name, loops, required) {
+            for (var i = 1; i < loops; i++){
+                $('input[name={0}{1}]'.format(name, i)).prop('required', required);
+                $('input[name={0}_desc{1}]'.format(name, i)).prop('required', required);
+                $('input[name={0}_date{1}]'.format(name, i)).prop('required', required);
             }
-        </script>
+        }
+        $(document).ready(function () {
+            $('#emailModal').modal('show');
+            $('#field_id_hourly_rate').hide();
+            $('#field_id_expected_hours_per_week').hide();
+            $('#id_milestones_0').click(hideMilestones);
+            $('#id_milestones_1').click(showMilestones);
+            $('#id_deliverables_0').click(hideDeliverables);
+            $('#id_deliverables_1').click(showDeliverables);
+            $('#id_fees_0').click(hideFees);
+            $('#id_fees_1').click(showFees);
+        });
+        function closeModal() {
+            $('#emailModal').modal('hide');
+        }
+        var showMilestones = function showMilestones() {
+            $('#milestones').show();
+            setRequired("milestone", 7, true);
+        };
+        var hideMilestones = function hideMilestones() {
+            $('#milestones').hide();
+            setRequired("milestone", 7, false);
+        };
+        var showDeliverables = function showDeliverables() {
+            $('#deliverables').show();
+            setRequired(name="deliverables", loops=6, required=true);
+        };
+        var hideDeliverables = function hideDeliverables() {
+            $('#deliverables').hide();
+            setRequired(name="deliverables", loops=7, required=false);
+        };
+        var showFees = function showFees(){
+            $('#fees').show();
+            $('#field_id_hourly_rate').hide();
+            $('#field_id_expected_hours_per_week').hide();
+            setRequired(name="fee", loops=6, required=true);
+        };
+        var hideFees = function hideFees(){
+            $('#fees').hide();
+            $('#field_id_hourly_rate').show();
+            $('#field_id_expected_hours_per_week').show();
+            setRequired(name="fee", loops=6, required=false);
+        };
+    </script>
+    <form>
         <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" id="emailModal">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -91,10 +142,145 @@
                     <fieldset>
                         <div class="pure-g">
                             {% for field in form %}
-                                <div class="pure-u-1">
+                                <div class="pure-u-1" id="field_{{ field.auto_id }}">
                                     {{ field.label }}
                                     {{ field }}
                                 </div>
+                                {% if field.auto_id == 'id_milestones' %}
+                                    <div class="pure-u-1" id="milestones" style="display: none">
+                                        <table class="pure-table pure-table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Milestones</th>
+                                                    <th>Description</th>
+                                                    <th>Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>Project Commencement</td>
+                                                    <td><input type="text" name="milestone_desc1" class="pure-u-1" title="milestone_desc1"/></td>
+                                                    <td><input type="text" name="milestone_date1" class="pure-u-1" title="milestone_date1" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td><input type="text" name="milestone2" title="milestone2" /></td>
+                                                    <td><input type="text" name="milestone_desc2" class="pure-u-1" title="milestone_desc2"/></td>
+                                                    <td><input type="text" name="milestone_date2" class="pure-u-1" title="milestone_date2" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>3</td>
+                                                    <td><input type="text" name="milestone3" title="milestone3" /></td>
+                                                    <td><input type="text" name="milestone_desc3" class="pure-u-1" title="milestone_desc3"/></td>
+                                                    <td><input type="text" name="milestone_date3" class="pure-u-1" title="milestone_date3" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>4</td>
+                                                    <td><input type="text" name="milestone4" title="milestone4" /></td>
+                                                    <td><input type="text" name="milestone_desc4" class="pure-u-1" title="milestone_desc4"/></td>
+                                                    <td><input type="text" name="milestone_date4" class="pure-u-1" title="milestone_date4" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>5</td>
+                                                    <td><input type="text" name="milestone5" title="milestone5" /></td>
+                                                    <td><input type="text" name="milestone_desc5" class="pure-u-1" title="milestone_desc5"/></td>
+                                                    <td><input type="text" name="milestone_date5" class="pure-u-1" title="milestone_date5" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>6</td>
+                                                    <td>Project Completion</td>
+                                                    <td><input type="text" name="milestone_desc6" class="pure-u-1" title="milestone_desc6"/></td>
+                                                    <td><input type="text" name="milestone_date6" class="pure-u-1" title="milestone_date6" /></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% elif field.auto_id == 'id_deliverables' %}
+                                        <div class="pure-u-1" id="deliverables" style="display: none">
+                                            <table class="pure-table pure-table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Deliverables</th>
+                                                        <th>Description</th>
+                                                        <th>Delivery Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td><input type="text" name="deliverables1" class="pure-u-1" title="deliverables1"/></td>
+                                                        <td><input type="text" name="deliverables_desc1" class="pure-u-1" title="deliverables_desc1"/></td>
+                                                        <td><input type="text" name="deliverables_date1" class="pure-u-1" title="deliverables_date1" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td><input type="text" name="deliverables2" title="deliverables2" /></td>
+                                                        <td><input type="text" name="deliverables_desc2" class="pure-u-1" title="deliverables_desc2"/></td>
+                                                        <td><input type="text" name="deliverables_date2" class="pure-u-1" title="deliverables_date2" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td><input type="text" name="deliverables3" title="deliverables3" /></td>
+                                                        <td><input type="text" name="deliverables_desc3" class="pure-u-1" title="deliverables_desc3"/></td>
+                                                        <td><input type="text" name="deliverables_date3" class="pure-u-1" title="deliverables_date3" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>4</td>
+                                                        <td><input type="text" name="deliverables4" title="milestone4" /></td>
+                                                        <td><input type="text" name="deliverables_desc4" class="pure-u-1" title="deliverables_desc4"/></td>
+                                                        <td><input type="text" name="deliverables_date4" class="pure-u-1" title="deliverables_date4" /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>5</td>
+                                                        <td><input type="text" name="deliverables5" title="deliverables5" /></td>
+                                                        <td><input type="text" name="deliverables_desc5" class="pure-u-1" title="deliverables_desc5"/></td>
+                                                        <td><input type="text" name="deliverables_date5" class="pure-u-1" title="deliverables_date5" /></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% elif field.auto_id == 'id_fees' %}
+                                        <div class="pure-u-1" id="fees" style="display: none">
+                                            <table class="pure-table pure-table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Milestone</th>
+                                                        <th>Payment Amount</th>
+                                                    </tr>
+                                                </thead>
+                                              <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td><input type="text" name="fee1" class="pure-u-1" title="fee1"/></td>
+                                                        <td><input type="text" name="fee_date1" class="pure-u-1" title="fee_date1"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td><input type="text" name="fee2" title="fee2" /></td>
+                                                        <td><input type="text" name="fee_date2" class="pure-u-1" title="fee_date2"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td><input type="text" name="fee3" title="fee3" /></td>
+                                                        <td><input type="text" name="fee_date3" class="pure-u-1" title="fee_date3"/></td>
+                                                    <tr>
+                                                        <td>4</td>
+                                                        <td><input type="text" name="fee4" title="feee4" /></td>
+                                                        <td><input type="text" name="fee_date4" class="pure-u-1" title="fee_date"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>5</td>
+                                                        <td><input type="text" name="fee5" title="fee5" /></td>
+                                                        <td><input type="text" name="fee_date5" class="pure-u-1" title="fee_date5"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                {% endif %}
                             {% endfor %}
                             {% csrf_token %}
                             <div class="pure-u-1">
