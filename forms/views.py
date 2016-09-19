@@ -336,7 +336,7 @@ def onboard_forms(request, user_id, document_type):
             {"exec_name": request.user.get_full_name() if request.user.account_type == 'E' else client.executive.user.get_full_name()},
         ]
         if document_type == 'statement_of_work':
-            if request.POST['milestone2']:
+            if request.POST.get('milestone2', None):
                 custom_fields.append({'milestone': 'Project Commencement'})
                 custom_fields.append({'milestone6': 'Project Completion'})
                 for i in range(1, 7):
@@ -345,14 +345,14 @@ def onboard_forms(request, user_id, document_type):
                         custom_fields.append({'milestone{0}'.format(i): request.POST['milestone{0}'.format(i)]})
                         custom_fields.append({'milestone_desc{0}'.format(i): request.POST['milestone_desc{0}'.format(i)]})
                         custom_fields.append({'milestone_date{0}'.format(i): request.POST['milestone_date{0}'.format(i)]})
-            if request.POST['deliverables1']:
+            if request.POST.get('deliverables1', None):
                 for i in range(1, 6):
                     if request.POST['deliverables{0}'.format(i)] and request.POST['deliverables_desc{0}'.format(i) and
                             request.POST['deliverables_date{0}'.format(i)]]:
                         custom_fields.append({'deliverables{0}'.format(i): request.POST['deliverables{0}'.format(i)]})
                         custom_fields.append({'deliverables_desc{0}'.format(i): request.POST['deliverables_desc{0}'.format(i)]})
                         custom_fields.append({'deliverables_date{0}'.format(i): request.POST['deliverables_date{0}'.format(i)]})
-            if request.POST['fees1']:
+            if request.POST.get('fees1', None):
                 for i in range(1, 6):
                     if request.POST['fees{0}'.format(i)] and request.POST['fees_date{0}'.format(i)]:
                         custom_fields.append({'fees{0}'.format(i): request.POST['fees{0}'.format(i)]})
@@ -369,10 +369,13 @@ def onboard_forms(request, user_id, document_type):
         setattr(client, '{}_file'.format(document_type), None)
         client.save()
         signature_request = generic_template_handler(request, document_type, custom_fields)
-        messages.success(request,
-                         'The {} form has been mailed for signatures. You can check it\'s status at {}.'.format(document_type,
-            signature_request.details_url))
-        return redirect('/clients/{}/'.format(client.user_id))
+        if signature_request:
+            messages.success(request,
+                             'The {} form has been mailed for signatures. You can check it\'s status at {}.'.format(document_type,
+                signature_request.details_url))
+            return redirect('/clients/{}/'.format(client.user_id))
+        else:
+            messages.error(request, 'Uh oh! Something went wrong with sending the form, please contact the system administrator.')
     return render(request, 'partials/forms.html', {'form': form, 'status': getattr(client, '{}_status'.format(document_type)),
                    'document_type': document_type, 'client': client, 'document': getattr(client, '{}_file'.format(document_type))})
 
