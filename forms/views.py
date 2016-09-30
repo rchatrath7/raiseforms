@@ -419,7 +419,7 @@ def send_document(request, user_id, document_type):
     else:
         token = user.client.generate_token(document_type)
         auth_url = request.META['HTTP_HOST'] + '/clients/' + user_id + '/forms/' + document_type + '/' + token
-        form = ContactForm(initial={'to': user.email, 'cc': request.user.email,
+        form = ContactForm(initial={'to': user.user.email, 'cc': request.user.email,
                                     'subject': 'Hello, {}, please fill out this {} form.'.format(user.get_full_name(), document_type.upper()),
                                     'message': 'Hi, our systems indicate that we\'ve sent you an NDA form to complete, '
                                                'but we have not received the sign document. Your Raise executive, {}, '
