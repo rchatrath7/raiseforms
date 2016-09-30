@@ -298,7 +298,7 @@ def remind_user(request, user_id, document_type):
             messages.error(request, 'Please correct the errors below!')
             return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
     else:
-        form = ContactForm(initial={'to': user.email, 'cc': request.user.email,
+        form = ContactForm(initial={'to': user.user.email, 'cc': request.user.email,
                                     'subject': 'Hello, {}, please fill out this {} form.'.format(user.user.first_name,
                                                                                                  document_type.upper()),
                                     'message': 'Hi, our systems indicate that we\'ve sent you an NDA form to complete, '
