@@ -410,7 +410,7 @@ def send_document(request, user_id, document_type):
                 body=message
             )
             msg.send()
-            messages.success(request, "The client {}, has been emailed successfully.".format(user.get_full_name))
+            messages.success(request, "The client {}, has been emailed successfully.".format(user.user.get_full_name()))
             form = ContactForm()
             return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
         else:
