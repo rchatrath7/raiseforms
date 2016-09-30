@@ -417,10 +417,10 @@ def send_document(request, user_id, document_type):
             messages.error(request, 'Please correct the errors below!')
             return render(request, 'partials/contact.html', {'form': form, 'client': user, 'user': request.user})
     else:
-        token = user.client.generate_token(document_type)
+        token = user.generate_token(document_type)
         auth_url = request.META['HTTP_HOST'] + '/clients/' + user_id + '/forms/' + document_type + '/' + token
         form = ContactForm(initial={'to': user.user.email, 'cc': request.user.email,
-                                    'subject': 'Hello, {}, please fill out this {} form.'.format(user.get_full_name(), document_type.upper()),
+                                    'subject': 'Hello, {}, please fill out this {} form.'.format(user.user.get_full_name(), document_type.upper()),
                                     'message': 'Hi, our systems indicate that we\'ve sent you an NDA form to complete, '
                                                'but we have not received the sign document. Your Raise executive, {}, '
                                                'has requested to remind you to please fill out this form and sign the '
