@@ -33,6 +33,7 @@ SECRET_KEY = 'yae54b*++rm5jq@wuo%8)owt(bunexph@&03w=242s8%k$urag'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if 'PROD_SETTING' in os.environ else True
 
+LOGIN_URL = '/login/'
 ALLOWED_HOSTS = ['*']
 
 def get_env_variable(var_name, default=False):

@@ -309,9 +309,10 @@ def remind_user(request, user_id, document_type):
 
 
 @login_required(login_url='/login/')
-@user_passes_test(user_is_executive)
 def onboard_forms(request, user_id, document_type):
     """
+    NOTE: THIS IS A HELPER FUNCTION TO PASS TO TWO DIFFERENT AUTHENTICATED FUNCTIONS: ONE FOR CLIENT FORMS
+    (TOKENIZED) AND THE OTHER FOR EXECUTIVE FORMS (ONLY ACCESSIBLE TO EXECUTIVES)
     We need to do a few things with this forms view. We need a generic view to handle creation of any given form,
     NDA, Statement of Work, Consulting Agreement, and Purchase Request. We need to allow the Executive to verify that
     the auto-generated information is correct and sign the document, then send the signed document to a Client. We also
@@ -380,7 +381,10 @@ def onboard_forms(request, user_id, document_type):
                    'document_type': document_type, 'client': client, 'document': getattr(client, '{}_file'.format(document_type))})
 
 
-@login_required(login_url='/login/')
+@user_passes_test(user_is_executive)
+def executive_only_access_forms(request, user_id, document_type):
+    return onboard_forms(request, user_id, document_type)
+
 def tokenized_form_handler(request, user_id, document_type, token):
     client = get_object_or_404(Client, user_id=user_id)
     if client.generate_token(document_type) == token:
