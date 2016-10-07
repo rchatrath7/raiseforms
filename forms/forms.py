@@ -2,7 +2,8 @@ from django import forms
 from django.forms import widgets, ModelForm
 from models import *
 from localflavor.us import forms as lf_forms
-
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth import get_user_model
 
 class ClientForm(forms.Form):
     # TODO: Consolidated address into pieces validated through lfForm Fields
@@ -142,4 +143,18 @@ class PurchaseRequestForm(forms.Form):
     payment_net_30 = forms.ChoiceField(widget=widgets.CheckboxInput)
     payment_terms_receipt = forms.ChoiceField(widget=widgets.CheckboxInput)
     additional_notes = forms.CharField(widget=widgets.Textarea)
+
+
+# Modified password reset form
+class NewPasswordResetForm(PasswordResetForm):
+    def get_users(self, email):
+        """Given an email, return matching user(s) who should receive a reset.
+
+        This allows subclasses to more easily customize the default policies
+        that prevent inactive users and users with unusable passwords from
+        resetting their password.
+        """
+        active_users = get_user_model()._default_manager.filter(
+            email__iexact=email, _is_active=True)
+        return (u for u in active_users if u.has_usable_password())
 

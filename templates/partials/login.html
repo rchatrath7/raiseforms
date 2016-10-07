@@ -1,5 +1,10 @@
 {% extends "partials/index.html" %}
 {% block content %}
+      <script type="text/javascript">
+        function redirect(url){
+            window.location.href = url;
+        }
+    </script>
     <div class="centered-container">
         <div class="centered">
             <div class="floating-login-box">
@@ -27,6 +32,7 @@
                             </div>
                         </div>
                     </fieldset>
+                    <a href="#" onclick="redirect('/accounts/password_reset')">Forgot Password</a>
                 </form>
             </div>
         </div>

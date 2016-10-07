@@ -16,8 +16,11 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 import forms.views as views
+from forms.forms import NewPasswordResetForm
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.views import \
+    password_reset, password_reset_done, password_reset_confirm, password_reset_complete
 
 
 urlpatterns = [
@@ -30,6 +33,12 @@ urlpatterns = [
     url(r'^accounts/register/(?P<auth_token>[\w\-]+)/$', views.register),
     url(r'^accounts/search/$', views.search),
     url(r'^accounts/search/(?P<query>[\w\-]+)/(?P<flag>[\w\-]+)/$', views.search),
+    url(r'^accounts/password_reset/$', password_reset, {'password_reset_form': NewPasswordResetForm},
+        name='reset_password_reset'),
+    url(r'^accounts/password_reset/done/$', password_reset_done, name='password_reset_done'),
+    url(r'^accounts/password_reset_confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        password_reset_confirm, name="password_reset_confirm"),
+    url(r'reset/complete/$', password_reset_complete, name='password_reset_complete'),
     url(r'^clients/(?P<user_id>\d+)/$', views.client_panel),
     url(r'^clients/(?P<user_id>\d+)/contact/$', views.contact),
     url(r'^clients/(?P<user_id>\d+)/manage/$', views.manage),
@@ -39,7 +48,8 @@ urlpatterns = [
     url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/remind_user/$', views.remind_user),
     url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/send/$', views.send_document),
     url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/retrieve/$', views.retrieve),
-    url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/(?P<token>[\w\-]+)/$', views.tokenized_form_handler)
+    url(r'^clients/(?P<user_id>\d+)/forms/(?P<document_type>[\w\-]+)/(?P<token>[\w\-]+)/$',
+        views.tokenized_form_handler)
 ]
 
 if settings.DEBUG:
