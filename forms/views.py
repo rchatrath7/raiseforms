@@ -374,7 +374,10 @@ def onboard_forms(request, user_id, document_type):
             messages.success(request,
                              'The {} form has been mailed for signatures. You can check it\'s status at {}.'.format(document_type,
                 signature_request.details_url))
-            return redirect('/clients/{}/'.format(client.user_id))
+            if request.user.account_type == 'E':
+                return redirect('/clients/{}/'.format(client.user_id))
+            else:
+                return redirect('/')
         else:
             messages.error(request, 'Uh oh! Something went wrong with sending the form, please contact the system administrator.')
     return render(request, 'partials/forms.html', {'form': form, 'status': getattr(client, '{}_status'.format(document_type)),
@@ -385,6 +388,8 @@ def onboard_forms(request, user_id, document_type):
 def executive_only_access_forms(request, user_id, document_type):
     return onboard_forms(request, user_id, document_type)
 
+
+@login_required(login_url='/login/')
 def tokenized_form_handler(request, user_id, document_type, token):
     client = get_object_or_404(Client, user_id=user_id)
     if client.generate_token(document_type) == token:
@@ -511,24 +516,22 @@ def generic_template_handler(request, template_id, custom_fields):
     client = HS(api_key=settings.HELLOSIGN_API_KEY)
     signers = [
         {'role_name': 'Executive', 'name': request.user.get_full_name() if request.user.account_type == 'E' else
-            request.user.executive.user.get_full_name(), 'email_address': request.user.email},
+            request.user.client.executive.user.get_full_name(), 'email_address': request.user.email
+                if request.user.account_type == 'E' else request.user.client.executive.user.email},
         {'role_name': 'Client', 'name': custom_fields[1]['full_name'], "email_address": custom_fields[0]['email']}
     ]
     raise_client = get_object_or_404(AbstractUserModel, email=custom_fields[0]['email'])
-    try:
-        signature_request = client.send_signature_request_with_template(
-                                        test_mode=True,
-                                        # client_id=settings.CLIENT_ID,
-                                        template_id=settings.TEMPLATE_IDS.get(template_id.upper()),
-                                        title="{0} form with Raise Inc.".format(template_id),
-                                        subject="Please sign this {0} form".format(template_id),
-                                        message="Please sign and verify all fields on this {0} form.".format(template_id),
-                                        signing_redirect_url=None,
-                                        signers=signers,
-                                        custom_fields=custom_fields[1:]
-        )
-    except Exception:
-        return None
+    signature_request = client.send_signature_request_with_template(
+                                    test_mode=True,
+                                    # client_id=settings.CLIENT_ID,
+                                    template_id=settings.TEMPLATE_IDS.get(template_id.upper()),
+                                    title="{0} form with Raise Inc.".format(template_id),
+                                    subject="Please sign this {0} form".format(template_id),
+                                    message="Please sign and verify all fields on this {0} form.".format(template_id),
+                                    signing_redirect_url=None,
+                                    signers=signers,
+                                    custom_fields=custom_fields[1:]
+    )
     raise_client.client.active_request_id = signature_request.signature_request_id
     raise_client.client.save()
     return signature_request
