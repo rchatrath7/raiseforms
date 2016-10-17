@@ -75,74 +75,65 @@
                                                                 </div>
                                                                 <fieldset>
                                                                     <div class="modal-body" style="height: auto">
-                                                                       <div class="centered-container" style="height: auto">
-                                                                            <div class="centered">
-                                                                                <div class="floating-login-box" style="height: auto">
-                                                                                   <h1>Please fill out this {{ document|upper }} form for {{ client.user.get_full_name }}</h1>
-                                                                                    <fieldset>
-                                                                                        <div class="pure-g">
-                                                                                            {% for field in forms|get_item:document %}
-                                                                                                <div class="pure-u-1">
-                                                                                                    {{ field.label }}
-                                                                                                    {{ field }}
-                                                                                                </div>
-                                                                                                {% if field.label == 'No Milestones are available for this service.' %}
-                                                                                                    <div class="pure-u-1" id="milestones">
-                                                                                                        <table class="pure-table pure-table-bordered">
-                                                                                                            <thead>
-                                                                                                                <tr>
-                                                                                                                    <th>#</th>
-                                                                                                                    <th>Milestones</th>
-                                                                                                                    <th>Description</th>
-                                                                                                                    <th>Date</th>
-                                                                                                                </tr>
-                                                                                                            </thead>
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td>1</td>
-                                                                                                                    <td>Project Commencement</td>
-                                                                                                                    <td><input type="text" name="milestone_desc1" class="pure-u-1" title="milestone_desc1"/></td>
-                                                                                                                    <td><input type="text" name="milestone_date1" class="pure-u-1" title="milestone_date1" /></td>
-                                                                                                                </tr>
-                                                                                                                <tr>
-                                                                                                                    <td>2</td>
-                                                                                                                    <td><input type="text" name="milestone2" title="milestone2" /></td>
-                                                                                                                    <td><input type="text" name="milestone_desc2" class="pure-u-1" title="milestone_desc2"/></td>
-                                                                                                                    <td><input type="text" name="milestone_date2" class="pure-u-1" title="milestone_date2" /></td>
-                                                                                                                </tr>
-                                                                                                                <tr>
-                                                                                                                    <td>3</td>
-                                                                                                                    <td><input type="text" name="milestone3" title="milestone3" /></td>
-                                                                                                                    <td><input type="text" name="milestone_desc3" class="pure-u-1" title="milestone_desc3"/></td>
-                                                                                                                    <td><input type="text" name="milestone_date3" class="pure-u-1" title="milestone_date3" /></td>
-                                                                                                                </tr>
-                                                                                                                <tr>
-                                                                                                                    <td>4</td>
-                                                                                                                    <td><input type="text" name="milestone4" title="milestone4" /></td>
-                                                                                                                    <td><input type="text" name="milestone_desc4" class="pure-u-1" title="milestone_desc4"/></td>
-                                                                                                                    <td><input type="text" name="milestone_date4" class="pure-u-1" title="milestone_date4" /></td>
-                                                                                                                </tr>
-                                                                                                                <tr>
-                                                                                                                    <td>5</td>
-                                                                                                                    <td><input type="text" name="milestone5" title="milestone5" /></td>
-                                                                                                                    <td><input type="text" name="milestone_desc5" class="pure-u-1" title="milestone_desc5"/></td>
-                                                                                                                    <td><input type="text" name="milestone_date5" class="pure-u-1" title="milestone_date5" /></td>
-                                                                                                                </tr>
-                                                                                                                <tr>
-                                                                                                                    <td>6</td>
-                                                                                                                    <td><input type="text" name="milestone6" title="milestone6" /></td>
-                                                                                                                    <td><input type="text" name="milestone_desc6" class="pure-u-1" title="milestone_desc6"/></td>
-                                                                                                                    <td><input type="text" name="milestone_date6" class="pure-u-1" title="milestone_date6" /></td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </div>
-                                                                                                {% endif %}
-                                                                                            {% endfor %}
-                                                                                        </div>
-                                                                                    </fieldset>
+                                                                        <div class="pure-g form">
+                                                                            {% for field in forms|get_item:document %}
+                                                                                <div class="pure-u-1">
+                                                                                    {{ field.label }}
+                                                                                    {{ field }}
                                                                                 </div>
-                                                                            </div>
+                                                                                {% if field.label == 'No Milestones are available for this service.' %}
+                                                                                    <div class="pure-u-1" id="milestones">
+                                                                                        <table class="pure-table pure-table-bordered">
+                                                                                            <thead>
+                                                                                                <tr>
+                                                                                                    <th>#</th>
+                                                                                                    <th>Milestones</th>
+                                                                                                    <th>Description</th>
+                                                                                                    <th>Date</th>
+                                                                                                </tr>
+                                                                                            </thead>
+                                                                                            <tbody>
+                                                                                                <tr>
+                                                                                                    <td>1</td>
+                                                                                                    <td>Project Commencement</td>
+                                                                                                    <td><input type="text" name="milestone_desc1" class="pure-u-1" title="milestone_desc1"/></td>
+                                                                                                    <td><input type="text" name="milestone_date1" class="pure-u-1" title="milestone_date1" /></td>
+                                                                                                </tr>
+                                                                                                <tr>
+                                                                                                    <td>2</td>
+                                                                                                    <td><input type="text" name="milestone2" title="milestone2" /></td>
+                                                                                                    <td><input type="text" name="milestone_desc2" class="pure-u-1" title="milestone_desc2"/></td>
+                                                                                                    <td><input type="text" name="milestone_date2" class="pure-u-1" title="milestone_date2" /></td>
+                                                                                                </tr>
+                                                                                                <tr>
+                                                                                                    <td>3</td>
+                                                                                                    <td><input type="text" name="milestone3" title="milestone3" /></td>
+                                                                                                    <td><input type="text" name="milestone_desc3" class="pure-u-1" title="milestone_desc3"/></td>
+                                                                                                    <td><input type="text" name="milestone_date3" class="pure-u-1" title="milestone_date3" /></td>
+                                                                                                </tr>
+                                                                                                <tr>
+                                                                                                    <td>4</td>
+                                                                                                    <td><input type="text" name="milestone4" title="milestone4" /></td>
+                                                                                                    <td><input type="text" name="milestone_desc4" class="pure-u-1" title="milestone_desc4"/></td>
+                                                                                                    <td><input type="text" name="milestone_date4" class="pure-u-1" title="milestone_date4" /></td>
+                                                                                                </tr>
+                                                                                                <tr>
+                                                                                                    <td>5</td>
+                                                                                                    <td><input type="text" name="milestone5" title="milestone5" /></td>
+                                                                                                    <td><input type="text" name="milestone_desc5" class="pure-u-1" title="milestone_desc5"/></td>
+                                                                                                    <td><input type="text" name="milestone_date5" class="pure-u-1" title="milestone_date5" /></td>
+                                                                                                </tr>
+                                                                                                <tr>
+                                                                                                    <td>6</td>
+                                                                                                    <td><input type="text" name="milestone6" title="milestone6" /></td>
+                                                                                                    <td><input type="text" name="milestone_desc6" class="pure-u-1" title="milestone_desc6"/></td>
+                                                                                                    <td><input type="text" name="milestone_date6" class="pure-u-1" title="milestone_date6" /></td>
+                                                                                                </tr>
+                                                                                            </tbody>
+                                                                                        </table>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                            {% endfor %}
                                                                         </div>
                                                                     </div>
                                                                     <div class="modal-footer">

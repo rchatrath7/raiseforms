@@ -30,7 +30,11 @@
         }
 
         function sort(flag) {
-            redirect('/accounts/search/{{ query }}/'+flag.value)
+            {% if query %}
+                redirect('/accounts/search/{{ query }}/'+flag.value);
+                {% else %}
+                    redirect('/accounts/search/browse/'+flag.value);
+            {% endif %}
         }
     </script>
     {% if not messages %}
@@ -71,7 +75,7 @@
                             <span class="fa fa-file-pdf-o {{ client.statement_of_work_status }} edit-button" onclick="redirect('/clients/{{ client.user_id }}/forms/statement_of_work')"></span> Statement Of Work Status: <strong class="{{ client.statement_of_work_status }}">{{ client.statement_of_work_status|capfirst }}</strong>
                         </div>
                         <div class="pure-u-1">
-                            <span class="fa fa-file-pdf-o {{ client.client.consulting_agreement_status }} edit-button" onclick="redirect('/clients/{{ client.user_id }}/forms/consulting_agreement')"></span> Consulting Agreement Status: <strong class="{{ client.consulting_agreement_status }}">{{ client.consulting_agreement_status|capfirst }}</strong>
+                            <span class="fa fa-file-pdf-o {{ client.consulting_agreement_status }} edit-button" onclick="redirect('/clients/{{ client.user_id }}/forms/consulting_agreement')"></span> Consulting Agreement Status: <strong class="{{ client.consulting_agreement_status }}">{{ client.consulting_agreement_status|capfirst }}</strong>
                         </div>
                     </fieldset>
                 </form>
