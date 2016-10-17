@@ -1,6 +1,6 @@
 input {
   display: block;
-  @include border-radius(5px);
+  //@include border-radius(5px);
   margin-top: 8px;
   margin-bottom: 8px;
   padding: 5px;
@@ -49,6 +49,12 @@ button {
 .btn.green {
   background-color: $green;
   color: #fff;
+}
+
+.btn.btn-search {
+  @extend .btn.green;
+  padding: 8px;
+  @include border-radius(0px);
 }
 
 .btn.clear {
