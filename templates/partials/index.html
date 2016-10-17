@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
             <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type="text/css"/>
+            <link rel='stylesheet prefetch' href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900|RobotoDraft:400,100,300,500,700,900'>
             <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
             <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
             <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css">
@@ -37,17 +38,29 @@
                 <div class="navigation-bar">
                     <ul>
                         <li><a class="active" href="/">Home</a></li>
-                        <form name="login" action="" method="post">
+                        <form id="login" name="login" action="" method="post">
                             {% if user.is_authenticated %}
                                 <li style="float:right"><a href="/logout/">Logout {{ user }}</a></li>
                                 {% csrf_token %}
-                                <li style="margin-left: 25%; width: 43%; font-family: 'Open Sans', sans-serif; {% if request.user.account_type == 'C' %} display: none{% endif %}">
-                                    <input class="pure-u-21-24" name="search" title="search" placeholder="Search for a client..." formaction="/accounts/search/" formmethod="post">
-                                    <input class="pure-u-2-24 btn btn green" style="padding: 5px" type="submit" formaction="/accounts/search/" formmethod="post" value="Search">
+                                <li style="margin-left: 30%; width: 35%; font-family: 'Open Sans', sans-serif; {% if request.user.account_type == 'C' %} display: none{% endif %}">
+                                    <div class="pure-u-1">
+                                        <input class="pure-u-1" name="search" style="margin-right: 0" title="search" placeholder="Search for a client..." formaction="/accounts/search/" formmethod="post">
+                                    </div>
+{#                                    <div class="pure-u-2-24">#}
+{#                                        <input class="pure-u-1 btn btn search" style="margin-left: 0" formaction="/accounts/search/" formmethod="post" value="Search">#}
+{#                                    </div>#}
+
+                                </li>
+                                <li style="width: 10%">
+                                    <div class="pure-u-1-5">
+                                        <button class="btn btn-search" style="{% if request.user.account_type  == 'C'%} display: none{% endif %}" type="submit" formaction="/accounts/search/" formmethod="post" value="Search">
+                                            <span class="fa fa-search"></span>
+                                        </button>
+                                    </div>
                                 </li>
                                 {% else %}
                                     {% csrf_token %}
-                                    <li style="float:right"><a style="cursor: pointer" onclick="login.submit()">Login</a></li>
+                                    <li style="float:right"><a href="javascript:$('#login').submit();" style="cursor: pointer">Login</a></li>
                                     <li style="float:right"><input class="pure-u-1" name="password" type="password" title="password" placeholder="Password"></li>
                                     <li style="float:right"><input class="pure-u-1" name="username" title="username" placeholder="Username"></li>
                             {% endif %}
