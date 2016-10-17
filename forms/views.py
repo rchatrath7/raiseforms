@@ -86,7 +86,8 @@ def login_handler(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return redirect(request.GET['next'])
+                _next = request.GET.get('next') or '/'
+                return redirect(_next)
             else:
                 messages.error(request, 'Invalid User! This user has an inactive account, please renew their account.')
                 return render(request, 'partials/login.html')
@@ -133,7 +134,7 @@ def home(request):
 @login_required(login_url='/login/')
 @user_passes_test(user_is_executive)
 def search(request, flag=None, query=None):
-    if request.method == 'POST' or query:
+    if request.method == 'POST' or query and query != 'browse':
         name = query or request.POST['search']
         if name == '':
             clients = AbstractUserModel.objects.filter(account_type='C')

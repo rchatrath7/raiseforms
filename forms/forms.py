@@ -112,9 +112,9 @@ class StatementOfWorkForm(forms.Form):
                'these rates and expected hours per week.'),
         (False, 'All services shall be provided by the Consultant for a defined total cost.')
     )
-    milestones = forms.ChoiceField(widget=widgets.RadioSelect(attrs={'class': 'pure-radio'}), choices=milestone_choices)
-    deliverables = forms.ChoiceField(widget=widgets.RadioSelect(attrs={'class': 'pure-radio'}), choices=deliverables_choices)
-    fees = forms.ChoiceField(widget=widgets.RadioSelect(attrs={'class': 'pure-radio'}), choices=fees_choices)
+    milestones = forms.ChoiceField(widget=widgets.RadioSelect(attrs={'class': 'pure-radio', 'style': 'width: auto'}), choices=milestone_choices)
+    deliverables = forms.ChoiceField(widget=widgets.RadioSelect(attrs={'class': 'pure-radio', 'style': 'width: auto'}), choices=deliverables_choices)
+    fees = forms.ChoiceField(widget=widgets.RadioSelect(attrs={'class': 'pure-radio', 'style': 'width: auto'}), choices=fees_choices)
     hourly_rate = forms.FloatField(widget=widgets.TextInput(attrs={'class': 'pure-u-1'}))
     expected_hours_per_week = forms.IntegerField(widget=widgets.TextInput(attrs={'class': 'pure-u-1'}))
     additional_terms_of_services = forms.CharField(widget=widgets.Textarea(attrs={'class': 'pure-u-1'}))
