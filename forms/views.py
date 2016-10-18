@@ -117,7 +117,7 @@ def home(request):
         user_form = ManageUserForm(instance=request.user)
         pending = [document if getattr(client, '{}_status'.format(document)) == 'pending' else None
                           for document in ['nda', 'statement_of_work', 'consulting_agreement']]
-        completed = [document if getattr(client, '{}_status'.format(document)) == 'completed' else None
+        completed = [{'name': document, 'file': getattr(client, '{}_file'.format(document))} if getattr(client, '{}_status'.format(document)) == 'completed' else None
                             for document in ['nda', 'statement_of_work', 'consulting_agreement']]
         forms = {
             'nda': NDAForm(request.POST or None, initial={'email': client.user.email, 'name': client.user.get_full_name()}),

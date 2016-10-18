@@ -2,12 +2,13 @@
 {% block content %}
     {% load apptags %}
      <script type="text/javascript">
-        function showModal() {
-            $('#formModal').modal('show');
+        function showModal(id) {
+            console.log(id+'Modal');
+            $('#'+id+'Modal').modal('show');
         }
 
-        function closeModal() {
-            $('#formModal').modal('hide');
+        function closeModal(id) {
+            $('#'+id+'Modal').modal('hide');
         }
     </script>
     <div class="centered-container">
@@ -64,13 +65,13 @@
                                     {% for document in pending %}
                                         <div class="pure-u-1">
                                             {% if document %}
-                                                <span class="fa fa-pencil-square-o" onclick="showModal()"> {{ document|upper }}</span>
+                                                <a href="#" onclick="showModal(id='form')"> {{ document|upper }}</a>
                                                  <form class="pure-form pure-form-stacked">
-                                                    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" id="formModal">
+                                                    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="formModalLabel" id="formModal">
                                                         <div class="modal-dialog">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                     <a class="close" onclick="closeModal()">×</a>
+                                                                     <a class="close" onclick="closeModal(id='form')">×</a>
                                                                      <h3>{{ document|upper }} form</h3>
                                                                 </div>
                                                                 <fieldset>
@@ -160,7 +161,26 @@
                                 {% for document in completed %}
                                     <div class="pure-u-1">
                                         {% if document %}
-                                            <a href="#" onclick="showModal()"> {{ document|upper }}</a>
+                                            <a href="#" onclick="showModal(id='{{ document.name }}')"> {{ document.name|upper }}</a>
+                                            <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="{{ document.name }}ModalLabel" id="{{ document.name }}Modal">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                             <a class="close" onclick="closeModal(id='{{ document.name }}')">×</a>
+                                                             <h3>{{ document.name|upper }} form</h3>
+                                                        </div>
+                                                        <div class="modal-body" style="height: auto">
+                                                            <iframe height="100%" width="100%"  name="plugin" datatype="application/pdf" src="{{ document.file.url }}"></iframe>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <div class="pure-g">
+                                                                <div class="pure-u-1">
+                                                                    <button type="button" name="cancel" class="pure-u-1 btn btn green" onclick="closeModal(id='{{ document.name }}')">Close</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                            </div>
                                         {% endif %}
                                     </div>
                                 {% endfor %}
